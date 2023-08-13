@@ -4,14 +4,20 @@ from bokeh.models import GMapOptions, ColumnDataSource, HoverTool, ColorBar, But
 from bokeh.transform import linear_cmap
 from bokeh.palettes import Plasma256 as palette, RdYlBu3
 from bokeh.layouts import column
-from src.IO import load_data
 import pandas as pd
 from dotenv import load_dotenv
 import os
-from src.config import cfg
+import urllib, json
 
 load_dotenv()
 GMAPS_API_KEY=os.environ['GMAPS_API_KEY']
+
+
+def load_data():
+    url = "https://tcgbusfs.blob.core.windows.net/dotapp/youbike/v2/youbike_immediate.json"
+    response = urllib.request.urlopen(url)
+    data = json.loads(response.read())
+    return data
 
 # create a plot and style its properties
 def get_data():
@@ -37,7 +43,7 @@ def plot(lat, lng, zoom=13, map_type='roadmap'):
         ]
     )
     p = gmap(GMAPS_API_KEY, gmap_options, title=f'Taipei YouBike2.0 Stations Updated: {df.iloc[0]["srcUpdateTime"]}', 
-             width=cfg.bokeh_width, height=cfg.bokeh_height, 
+             width=1000, height=800, 
             tools=[hover, 'reset', 'wheel_zoom', 'pan'])
     source = ColumnDataSource(df)
     mapper = linear_cmap('usage', palette, 0., 1.)   
