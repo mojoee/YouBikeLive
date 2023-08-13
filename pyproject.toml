@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "30-youbike"
+version = "0.1.0"
+description = "project for analysing youbike with opensource data"
+authors = ["mojoee <47809126+mojoee@users.noreply.github.com>"]
+readme = "README.md"
+packages = [{include = "30_youbike"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+pandas = "^2.0.3"
+geopandas = "^0.13.2"
+matplotlib = "^3.7.2"
+bokeh = "^3.2.1"
+python-dotenv = "^1.0.0"
+flask = "^2.3.2"
+
+
+[tool.poetry.group.dev.dependencies]
+ipykernel = "^6.25.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
