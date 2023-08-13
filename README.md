@@ -1,4 +1,4 @@
-<!-- Improved compatibility of back to top link: See: https://github.com/othneildrew/Best-README-Template/pull/73 -->
+<!-- Improved compatibility of back to top link: See: https://github.com/mojoee/YouBikeLive/pull/73 -->
 <a name="readme-top"></a>
 <!--
 *** Thanks for checking out the Best-README-Template. If you have a suggestion
@@ -30,7 +30,7 @@
 <!-- PROJECT LOGO -->
 <br />
 <div align="center">
-  <a href="https://github.com/othneildrew/Best-README-Template">
+  <a href="https://github.com/mojoee/YouBikeLive">
     <img src="docs/TaiwanFlag.svg" alt="Logo" width="80" height="80">
   </a>
 
@@ -39,14 +39,14 @@
   <p align="center">
     An awesome Visualization of YouBike2.0 Stations in Taipei City!
     <br />
-    <a href="https://github.com/othneildrew/Best-README-Template"><strong>Explore the docs »</strong></a>
+    <a href="https://github.com/mojoee/YouBikeLive"><strong>Explore the docs »</strong></a>
     <br />
     <br />
-    <a href="https://github.com/othneildrew/Best-README-Template">View Demo</a>
+    <a href="https://github.com/mojoee/YouBikeLive">View Demo</a>
     ·
-    <a href="https://github.com/othneildrew/Best-README-Template/issues">Report Bug</a>
+    <a href="https://github.com/mojoee/YouBikeLive/issues">Report Bug</a>
     ·
-    <a href="https://github.com/othneildrew/Best-README-Template/issues">Request Feature</a>
+    <a href="https://github.com/mojoee/YouBikeLive/issues">Request Feature</a>
   </p>
 </div>
 
@@ -144,7 +144,7 @@ Usage is in the web app
 - [x] Add back to top links
 - [ ] Add heroku deployment
 
-See the [open issues](https://github.com/othneildrew/Best-README-Template/issues) for a full list of proposed features (and known issues).
+See the [open issues](https://github.com/mojoee/YouBikeLive/issues) for a full list of proposed features (and known issues).
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -195,7 +195,7 @@ Use this space to list resources you find helpful and would like to give credit 
 
 * [Tutorial on data visualization](https://thedatafrog.com/en/articles/show-data-google-map-python/)
 * [GitHub Emoji Cheat Sheet](https://www.webpagefx.com/tools/emoji-cheat-sheet)
-* [README layout](https://github.com/othneildrew/Best-README-Template)
+* [README layout](https://github.com/mojoee/YouBikeLive)
 * [Img Shields](https://shields.io)
 * [GitHub Pages](https://pages.github.com)
 * [Font Awesome](https://fontawesome.com)
@@ -212,7 +212,7 @@ Use this space to list resources you find helpful and would like to give credit 
 [forks-url]: https://github.com/mojoee/YouBikeLive/network/members
 [stars-shield]: https://img.shields.io/github/stars/mojoee/YouBikeLive.svg?style=for-the-badge
 [stars-url]: https://github.com/mojoee/YouBikeLive/stargazers
-[issues-shield]: https://img.shields.io/github/issues/othneildrew/Best-README-Template.svg?style=for-the-badge
+[issues-shield]: https://img.shields.io/github/issues/mojoee/YouBikeLive.svg?style=for-the-badge
 [issues-url]: https://github.com/mojoee/YouBikeLive/issues
 [license-shield]: https://img.shields.io/github/license/mojoee/YouBikeLive.svg?style=for-the-badge
 [license-url]: https://github.com/mojoee/YouBikeLive/blob/master/LICENSE.txt
