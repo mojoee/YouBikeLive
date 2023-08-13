@@ -1,1 +1,1 @@
-web: bokeh serve --log-level=debug --use-xheaders myapp.py
+web: bokeh serve --log-level=debug --port=$PORT --allow-websocket-origin=youbikelive-1997a5b6ef93.herokuapp.com --address=0.0.0.0 --use-xheaders myapp.py
