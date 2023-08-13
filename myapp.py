@@ -53,8 +53,8 @@ def plot(lat, lng, zoom=13, map_type='roadmap'):
     p.add_layout(color_bar, 'right') 
     center = p.circle('lng', 'lat', radius="radius", alpha=0.6, 
                       color=mapper, source=source)
-    show(p)
-    save(p)
+    #show(p)
+    #save(p)
     return p
 
 
@@ -67,5 +67,3 @@ button.on_click(get_data)
 
 # put the button and plot in a layout and add to the document
 curdoc().add_root(column(button, p))
-session = push_session(curdoc())
-session.show()
