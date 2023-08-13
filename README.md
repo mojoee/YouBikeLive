@@ -31,7 +31,7 @@
 <br />
 <div align="center">
   <a href="https://github.com/mojoee/YouBikeLive">
-    <img src="docs/TaiwanFlag.svg" alt="Logo" width="80" height="80">
+    <img src="docs/TaiwanFlag.svg" alt="Logo" width="90" height="60">
   </a>
 
   <h3 align="center">YouBikeLive</h3>
@@ -133,7 +133,7 @@ The project is managed with poetry and will make it easy to use on your machine.
 <!-- USAGE EXAMPLES -->
 ## Usage
 
-Usage is in the web app
+You can reach the web-hosted page [here](https://youbikelive-1997a5b6ef93.herokuapp.com/myapp).
 
 
 
@@ -180,7 +180,7 @@ Distributed under the MIT License. See `LICENSE.txt` for more information.
 <!-- CONTACT -->
 ## Contact
 
-Moritz Sontheimer - moritzsontheimer@weg.de
+Moritz Sontheimer - moritzsontheimer@web.de
 
 Project Link: [https://github.com/mojoee/YouBikeLive](https://github.com/mojoee/YouBikeLive)
 
