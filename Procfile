@@ -1,1 +1,1 @@
-web: bokeh serve --port=$PORT --show --allow-websocket-origin=youbikelive-1997a5b6ef93.herokuapp.com --allow-websocket-origin=myapp.herokuapp.com --allow-websocket-origin=0.0.0.0:$PORT --address=0.0.0.0 --use-xheaders myapp.py
+web: bokeh serve --port=$PORT --show --allow-websocket-origin=youbikelive-1997a5b6ef93.herokuapp.com --allow-websocket-origin=myapp.herokuapp.com --allow-websocket-origin=0.0.0.0:$PORT/myapp --address=0.0.0.0 --use-xheaders myapp.py
