@@ -9,7 +9,9 @@ import pandas as pd
 from dotenv import load_dotenv
 import os
 import urllib, json
+from bokeh.settings import settings
 
+settings.resources = 'inline'
 load_dotenv()
 GMAPS_API_KEY=os.environ['GMAPS_API_KEY']
 
