@@ -4,6 +4,7 @@ from bokeh.models import GMapOptions, ColumnDataSource, HoverTool, ColorBar, But
 from bokeh.transform import linear_cmap
 from bokeh.palettes import Plasma256 as palette, RdYlBu3
 from bokeh.layouts import column
+from bokeh.client import push_session
 import pandas as pd
 from dotenv import load_dotenv
 import os
@@ -66,3 +67,5 @@ button.on_click(get_data)
 
 # put the button and plot in a layout and add to the document
 curdoc().add_root(column(button, p))
+session = push_session(curdoc())
+session.show()
