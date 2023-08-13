@@ -1,1 +1,1 @@
-poetry run python -m bokeh serve --show src/app.py
+web: python -m bokeh serve --show src/app.py

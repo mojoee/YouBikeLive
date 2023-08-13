@@ -8,7 +8,7 @@ from src.IO import load_data
 import pandas as pd
 from dotenv import load_dotenv
 import os
-from config import cfg
+from src.config import cfg
 
 load_dotenv()
 GMAPS_API_KEY=os.environ['GMAPS_API_KEY']
