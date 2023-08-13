@@ -199,6 +199,7 @@ Use this space to list resources you find helpful and would like to give credit 
 * [Img Shields](https://shields.io)
 * [GitHub Pages](https://pages.github.com)
 * [Font Awesome](https://fontawesome.com)
+* [Taipei Open Source Data](https://data.taipei/dataset?qs=youbike)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
