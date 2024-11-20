@@ -5,9 +5,21 @@ import sys
 import json
 
 
-# Load instance
-path = sys.argv[1]
+# PARAMETERS
+path = "./data/demo.json"
+output = "./results/demo.json"
+time_limit = 5
 
+for i in range(len(sys.argv)):
+    if sys.argv[i] == '-i':
+        path = sys.argv[i+1]
+    elif sys.argv[i] == '-o':
+        output = sys.argv[i+1]
+    elif sys.argv[i] == '-t':
+        time_limit = int(sys.argv[i+1])
+
+
+# LOAD
 with open(path, 'r') as file:
     data = json.load(file)
 
@@ -18,7 +30,6 @@ vehicles_capacity = data["vehicles"]["capacity"]
 dist_matrix_data = data["distances"]
 dist_from_depot_data = data["depot"]["dists_from_depot"]
 dist_to_depot_data = data["depot"]["dists_to_depot"]
-
 
 
 # MODEL
@@ -73,19 +84,34 @@ with hexaly.optimizer.HexalyOptimizer() as optimizer:
     model.minimize(total_distance)
     model.close()
 
+
     # SOLVE
-    optimizer.param.time_limit = 5
+    optimizer.param.time_limit = time_limit
     optimizer.solve()
 
-    # TODO output
-    for k in range(vehicles_cnt):
-        used = vehicles_used[k].value
-        print("Vehicle %i used: %i" % (k, used))
-        if used:
-            for customer in routes[k].value:
-                print(customer, end=" ")
-            print()
-            for load in loads[k].value:
-                print(load, end=" ")
-            print()
+
+    # OUTPUT
+    result = {}
     
+    sol = optimizer.get_solution()
+
+    result["instance"] = path
+    result["time_limit"] = optimizer.param.time_limit
+    result["running_time"] = optimizer.get_statistics().get_running_time()
+    result["status"] = str(sol.get_status()).replace('HxSolutionStatus.', '')
+    result["objectives"] = [
+        {"name": "vehicles_used", "value": sol.get_value(vehicles_used_cnt), "bound": sol.get_objective_bound(0), "gap": sol.get_objective_gap(0)},
+        {"name": "total_distance", "value": sol.get_value(total_distance), "bound": sol.get_objective_bound(1), "gap": sol.get_objective_gap(1)}
+        ]
+    result["routes"] = []
+    for k in range(vehicles_cnt):
+        if vehicles_used[k].value:
+            route = [station for station in routes[k].value]
+            leaving_load = [load for load in loads[k].value]
+            result["routes"].append({"route": route, "leaving_load": leaving_load})
+    
+    result_string = json.dumps(result, indent=4)
+
+    with open(output, "w") as outfile:
+        outfile.write(result_string)
+        print("Solution exported to", output)
