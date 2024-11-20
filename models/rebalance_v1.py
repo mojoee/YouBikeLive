@@ -6,21 +6,21 @@ import json
 
 
 # PARAMETERS
-path = "./data/demo.json"
-output = "./results/demo.json"
+instance_path = "./data/demo.json"
+solution_path = "./results/demo.json"
 time_limit = 5
 
 for i in range(len(sys.argv)):
     if sys.argv[i] == '-i':
-        path = sys.argv[i+1]
+        instance_path = sys.argv[i+1]
     elif sys.argv[i] == '-o':
-        output = sys.argv[i+1]
+        solution_path = sys.argv[i+1]
     elif sys.argv[i] == '-t':
         time_limit = int(sys.argv[i+1])
 
 
 # LOAD
-with open(path, 'r') as file:
+with open(instance_path, 'r') as file:
     data = json.load(file)
 
 stations_cnt = len(data["stations"])
@@ -30,6 +30,8 @@ vehicles_capacity = data["vehicles"]["capacity"]
 dist_matrix_data = data["distances"]
 dist_from_depot_data = data["depot"]["dists_from_depot"]
 dist_to_depot_data = data["depot"]["dists_to_depot"]
+
+
 
 
 # MODEL
@@ -90,12 +92,14 @@ with hexaly.optimizer.HexalyOptimizer() as optimizer:
     optimizer.solve()
 
 
+
+
     # OUTPUT
     result = {}
     
     sol = optimizer.get_solution()
 
-    result["instance"] = path
+    result["instance"] = instance_path
     result["time_limit"] = optimizer.param.time_limit
     result["running_time"] = optimizer.get_statistics().get_running_time()
     result["status"] = str(sol.get_status()).replace('HxSolutionStatus.', '')
@@ -112,6 +116,6 @@ with hexaly.optimizer.HexalyOptimizer() as optimizer:
     
     result_string = json.dumps(result, indent=4)
 
-    with open(output, "w") as outfile:
+    with open(solution_path, "w") as outfile:
         outfile.write(result_string)
-        print("Solution exported to", output)
+        print("Solution exported to", solution_path)
