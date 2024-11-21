@@ -84,3 +84,4 @@ if res:
     print(Fore.GREEN + 'All tests passed!')
 else:
     print(Fore.RED + 'Some tests failed!')
+print(Fore.WHITE)

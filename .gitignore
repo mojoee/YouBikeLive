@@ -2,5 +2,5 @@
 .venv
 *.lock
 *.pyc
-data/nX-20_v5-30
-data/nX-30_v5-30
+data/optimization
+results/optimization
