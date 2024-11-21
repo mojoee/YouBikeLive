@@ -7,7 +7,7 @@ import json
 
 # PARAMETERS
 instance_path = "./data/demo.json"
-solution_path = "./results/demo.json"
+solution_path = "./demo.json"
 time_limit = 5
 
 for i in range(len(sys.argv)):
