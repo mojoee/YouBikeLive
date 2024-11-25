@@ -1,0 +1,21 @@
+{
+    "instance": "./data/n20_v5-20.json",
+    "time_limit": 5,
+    "running_time": 5,
+    "status": "INFEASIBLE",
+    "objectives": [
+        {
+            "name": "vehicles_used",
+            "value": 0,
+            "bound": 1,
+            "gap": 0.0
+        },
+        {
+            "name": "total_distance",
+            "value": 0.0,
+            "bound": 4189.112886364647,
+            "gap": 0.0
+        }
+    ],
+    "routes": []
+}
