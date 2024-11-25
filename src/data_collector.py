@@ -13,6 +13,31 @@ URL = 'https://tcgbusfs.blob.core.windows.net/dotapp/youbike/v2/youbike_immediat
 conn = sqlite3.connect('youbike_data.db')
 cursor = conn.cursor()
 
+'''
+
+Sample Observation
+{
+    "sno": "500101001",
+    "sna": "YouBike2.0_捷運科技大樓站",
+    "sarea": "大安區",
+    "mday": "2024-11-25 12:02:15",
+    "ar": "復興南路二段235號前",
+    "sareaen": "Daan Dist.",
+    "snaen": "YouBike2.0_MRT Technology Bldg. Sta.",
+    "aren": "No.235， Sec. 2， Fuxing S. Rd.",
+    "act": "1",
+    "srcUpdateTime": "2024-11-25 12:02:24",
+    "updateTime": "2024-11-25 12:02:52",
+    "infoTime": "2024-11-25 12:02:15",
+    "infoDate": "2024-11-25",
+    "total": 28,
+    "available_rent_bikes": 1,
+    "latitude": 25.02605,
+    "longitude": 121.5436,
+    "available_return_bikes": 26
+  }
+
+'''
 # Create table if it doesn't exist
 cursor.execute('''
     CREATE TABLE IF NOT EXISTS youbike_data (

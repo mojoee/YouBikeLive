@@ -92,6 +92,8 @@ What is displayed:
 * the size (number of total bike slots) of the stations displayed as the radius of the station
 * the usage of the station (ratio of size and available bikes)
 
+This repo also explores the YouBike Rental Trip data from 2023, which can be found [here](https://data.gov.tw/en/datasets/169174).
+
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
