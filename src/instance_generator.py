@@ -9,37 +9,43 @@ conn = sqlite3.connect('youbike_data.db')
 
 # Query the latest data from the database
 # Execute the query
-query = """
-WITH RankedStations AS (
+def fetch_stations(time_of_interest):
+
+    query = f"""
+    WITH RankedStations AS (
+        SELECT 
+            sno, 
+            snaen, 
+            latitude, 
+            longitude, 
+            total AS capacity, 
+            available_rent_bikes AS s_init, 
+            mday,
+            ROW_NUMBER() OVER (PARTITION BY sno ORDER BY mday ASC) AS rank
+        FROM youbike_data
+        WHERE strftime('%H:%M', mday) >= '{time_of_interest}'
+    )
     SELECT 
         sno, 
         snaen, 
         latitude, 
         longitude, 
-        total AS capacity, 
-        available_rent_bikes AS s_init, 
-        mday,
-        ROW_NUMBER() OVER (PARTITION BY sno ORDER BY mday ASC) AS rank
-    FROM youbike_data
-    WHERE strftime('%H:%M', mday) >= '11:30'
-)
-SELECT 
-    sno, 
-    snaen, 
-    latitude, 
-    longitude, 
-    capacity, 
-    s_init, 
-    mday
-FROM RankedStations
-WHERE rank = 1
-"""
-df = pd.read_sql_query(query, conn)
+        capacity, 
+        s_init, 
+        mday
+    FROM RankedStations
+    WHERE rank = 1
+    """
+    df = pd.read_sql_query(query, conn)
 
-# Close the connection
-conn.close()
+    # Close the connection
+    conn.close()
+    return df
+
 
 # Compute the total number of bikes and total capacity
+time = "12:30" 
+df = fetch_stations(time)
 total_bikes = df['s_init'].sum()
 total_capacity = df['capacity'].sum()
 
@@ -116,7 +122,8 @@ instance = {
 }
 
 # Print or save the result
-name = "test"
+# name is 
+name = f"test_{time}"
 output_file = f"./data/instances/instance_{name}.json"
 with open(output_file, "w") as f:
     json.dump(instance, f, indent=4)

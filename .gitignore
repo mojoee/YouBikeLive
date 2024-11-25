@@ -5,3 +5,5 @@
 data/optimization
 results/optimization
 202302_YouBike_Rental.csv
+data/instances
+*.db
