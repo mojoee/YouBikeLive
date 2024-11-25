@@ -8,11 +8,31 @@ import json
 conn = sqlite3.connect('youbike_data.db')
 
 # Query the latest data from the database
+# Execute the query
 query = """
-SELECT sno, snaen, latitude, longitude, total AS capacity, available_rent_bikes AS s_init, 
-       total AS s_goal
-FROM youbike_data
-WHERE mday = (SELECT MAX(mday) FROM youbike_data)
+WITH RankedStations AS (
+    SELECT 
+        sno, 
+        snaen, 
+        latitude, 
+        longitude, 
+        total AS capacity, 
+        available_rent_bikes AS s_init, 
+        mday,
+        ROW_NUMBER() OVER (PARTITION BY sno ORDER BY mday ASC) AS rank
+    FROM youbike_data
+    WHERE strftime('%H:%M', mday) >= '11:30'
+)
+SELECT 
+    sno, 
+    snaen, 
+    latitude, 
+    longitude, 
+    capacity, 
+    s_init, 
+    mday
+FROM RankedStations
+WHERE rank = 1
 """
 df = pd.read_sql_query(query, conn)
 
