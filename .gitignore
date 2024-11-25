@@ -2,3 +2,5 @@
 .venv
 *.lock
 *.pyc
+data/optimization
+results/optimization
