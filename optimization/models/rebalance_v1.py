@@ -6,7 +6,7 @@ import json
 
 
 # PARAMETERS
-instance_path = "./data/demo.json"
+instance_path = "./data/instances/demo.json"
 solution_path = "./demo.json"
 time_limit = 5
 
@@ -23,6 +23,8 @@ for i in range(len(sys.argv)):
 with open(instance_path, 'r') as file:
     data = json.load(file)
 
+data["stations"].sort(key = lambda x:x["id"])
+
 stations_cnt = len(data["stations"])
 demands_data = [station["s_goal"] - station["s_init"] for station in data["stations"]]
 vehicles_cnt = data["vehicles"]["count"]
@@ -31,7 +33,11 @@ dist_matrix_data = data["distances"]
 dist_from_depot_data = data["depot"]["dists_from_depot"]
 dist_to_depot_data = data["depot"]["dists_to_depot"]
 
-
+print("stations_cnt:", stations_cnt)
+print("demand_min:", min(demands_data))
+print("demand_max", max(demands_data))
+print("venicles_capacity:", vehicles_capacity)
+print("vehicles_cnt:", vehicles_cnt)
 
 
 # MODEL
