@@ -73,6 +73,7 @@ depot = {
     "coords": [25.02000, 121.53300]  # Example depot coordinates
 }
 
+df.reset_index(inplace=True)
 # Compute distances between stations and to/from the depot
 station_coords = df[['latitude', 'longitude']].values
 depot_coords = np.array(depot['coords'])
