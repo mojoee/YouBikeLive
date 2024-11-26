@@ -2,6 +2,6 @@
 .venv
 *.lock
 *.pyc
-data/optimization
-results/optimization
+data/random
+results/random
 202302_YouBike_Rental.csv
