@@ -86,10 +86,10 @@ with hexaly.optimizer.HexalyOptimizer() as optimizer:
 
     # OBJECTIVES
     # Total distance traveled
-    total_distance = model.sum(routes_lens)
+    max_distance = model.max(routes_lens)
 
     # Objective: minimize the number of vehicles used, then minimize the distance traveled
-    model.minimize(total_distance)
+    model.minimize(max_distance)
     model.close()
 
 
@@ -110,7 +110,7 @@ with hexaly.optimizer.HexalyOptimizer() as optimizer:
     result["running_time"] = optimizer.get_statistics().get_running_time()
     result["status"] = str(sol.get_status()).replace('HxSolutionStatus.', '')
     result["objectives"] = [
-        {"name": "total_distance", "value": sol.get_value(total_distance), "bound": sol.get_objective_bound(0), "gap": sol.get_objective_gap(0)}
+        {"name": "max_distance", "value": sol.get_value(max_distance), "bound": sol.get_objective_bound(0), "gap": sol.get_objective_gap(0)}
         ]
     result["routes"] = []
     for k in range(vehicles_cnt):
