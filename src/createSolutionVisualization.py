@@ -24,6 +24,7 @@ def visualize_tsp_paths(instance, tsp_routes, map_output="./results/visualizatio
     # Initialize a folium map centered on the first station
     first_route = tsp_routes[0]['route']
     first_station = stations.iloc[first_route[0]]
+    depot_coords = instance['depot']['coords']
     map_center = first_station['coords'][0], first_station['coords'][1]
     mymap = folium.Map(location=map_center, zoom_start=13)
 
@@ -37,10 +38,23 @@ def visualize_tsp_paths(instance, tsp_routes, map_output="./results/visualizatio
             radius=5,                # Adjust radius for smaller markers
             color="blue",            # Border color of the circle
             fill=True,               # Fill the circle with color
-            fill_color="blue",       # Fill color of the circle
+            fill_color="gray",       # Fill color of the circle
             fill_opacity=0.7,        # Adjust transparency
             tooltip=f"Station ID: {row['id']}"  # Tooltip on hover
         ).add_to(marker_group)
+
+
+    # add the marker for the station
+    folium.CircleMarker(
+        location=depot_coords,  # Coordinates of the station
+        radius=15,                # Adjust radius for smaller markers
+        color="red",            # Border color of the circle
+        fill=True,               # Fill the circle with color
+        fill_color="gray",       # Fill color of the circle
+        fill_opacity=0.7,        # Adjust transparency
+        tooltip="Depot"  # Tooltip on hover
+    ).add_to(marker_group)
+
 
     # Add the FeatureGroup to the map
     marker_group.add_to(mymap)
@@ -50,11 +64,14 @@ def visualize_tsp_paths(instance, tsp_routes, map_output="./results/visualizatio
     colormap = cm.get_cmap('tab10', num_routes)  # Use a discrete colormap
     route_colors = [colors.rgb2hex(colormap(i)[:3]) for i in range(num_routes)]
 
+
     # Add the TSP paths with unique colors
     for idx, route in enumerate(tsp_routes):
         path_coordinates = [stations.iloc[i]['coords'] for i in route['route']]
+        path_coordinates.insert(0, depot_coords)
+        path_coordinates.append(depot_coords)
         folium.PolyLine(
-            path_coordinates, color=route_colors[idx], weight=2.5, opacity=1,
+            path_coordinates, color=route_colors[idx], weight=4, opacity=1,
             tooltip=f"Route {idx + 1}"
         ).add_to(mymap)
 
