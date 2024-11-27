@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 from geopy.distance import geodesic
 import json
+from config import cfg 
 
 # Connect to the SQLite database
 conn = sqlite3.connect('youbike_data.db')
@@ -44,7 +45,7 @@ def fetch_stations(time_of_interest):
 
 
 # Compute the total number of bikes and total capacity
-time = "12:30" 
+time = cfg.instance_time
 df = fetch_stations(time)
 total_bikes = df['s_init'].sum()
 total_capacity = df['capacity'].sum()
