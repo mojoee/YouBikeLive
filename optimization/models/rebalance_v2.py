@@ -50,35 +50,54 @@ with hexaly.optimizer.HexalyOptimizer() as optimizer:
     dist_to_depot = model.array(dist_to_depot_data)
 
     # DECISION VARIABLES 
-    routes = [model.list(stations_cnt) for _ in range(vehicles_cnt)] # Sequence of stations visited by each vehicle
-    loads = [None] * vehicles_cnt # current vehicle loads at each station
+    # Sequence of stations visited by each vehicle
+    routes = [model.list(stations_cnt) for _ in range(vehicles_cnt)] 
+
+    # deliveries[k][l] . . . delivery made by vehicle k to station l
+    deliveries = [[model.int(-vehicles_capacity, vehicles_capacity) for _ in range(stations_cnt)] for _ in range(vehicles_cnt)] 
 
     # CONSTRAINTS
-    # All customers must be visited by exactly one vehicle
-    # model.constraint(model.partition(routes)) # TODO replace by intersection of size == stations_cnt
+    # each station is visited at least once
+    model.constraint(model.cover(routes)) 
 
     # A vehicle is used if it visits at least one customer
     vehicles_used = [(model.count(routes[k]) > 0) for k in range(vehicles_cnt)]
-
     routes_lens = [None] * vehicles_cnt
     for k in range(vehicles_cnt):
         route = routes[k]
         c = model.count(route)
 
-        # Vehicle loads must be non-negative and within vehicle capacity at all times
-        demand_lambda = model.lambda_function(lambda i, prev: prev - demands[route[i]])
-        loads[k] = model.array(model.range(0, c), demand_lambda, 0)
-
-        # Constraint on min and max vehicle capacity
-        max_quantity_lambda = model.lambda_function(lambda i: loads[k][i] <= vehicles_capacity)
-        model.constraint(model.and_(model.range(0, c), max_quantity_lambda))
-
-        min_quantity_lambda = model.lambda_function(lambda i: loads[k][i] >= 0)
-        model.constraint(model.and_(model.range(0, c), min_quantity_lambda))
-
         # Distance traveled by each vehicle
         dist_lambda = model.lambda_function(lambda i: model.at(dist_matrix, route[i - 1], route[i]))
         routes_lens[k] = model.sum(model.range(1, c), dist_lambda) + model.iif(c > 0, dist_from_depot[route[0]] + dist_to_depot[route[c - 1]], 0)
+
+
+    # SUM UP DELIVERIES TO A SINGLE STATION
+    total_delivery_0 = model.sum(deliveries[k][0] for k in range(vehicles_cnt))
+    model.constraint(total_delivery_0 == model.at(demands, 0))
+
+
+    
+
+    # total_deliveries = [None] * stations_cnt
+    # for l in range(stations_cnt):
+    #     delivery_lambda = model.lambda_function(lambda i: model.at())
+    #     # total_deliveries[l] = 
+
+    #  get total delivery to station 0
+    # k = 0 # vehicle
+    # l = 0 # station
+    # l_id = model.index(routes[k], l)
+    # model.at(deliveries[k], l_id)
+
+
+    # a = deliveries[k]
+    # delivery_0_0 = deliveries[k][l]
+
+    # total_delivery_0 = [deliveries[k][routes[k], l] for k in range(vehicles_cnt)]
+
+
+
 
     # OBJECTIVES
     # Total number of vehicles
@@ -88,16 +107,14 @@ with hexaly.optimizer.HexalyOptimizer() as optimizer:
     total_distance = model.sum(routes_lens)
 
     # Objective: minimize the number of vehicles used, then minimize the distance traveled
-    model.minimize(vehicles_used_cnt)
     model.minimize(total_distance)
+    model.minimize(vehicles_used_cnt)
     model.close()
 
 
     # SOLVE
     optimizer.param.time_limit = time_limit
     optimizer.solve()
-
-
 
 
     # OUTPUT
@@ -110,15 +127,14 @@ with hexaly.optimizer.HexalyOptimizer() as optimizer:
     result["running_time"] = optimizer.get_statistics().get_running_time()
     result["status"] = str(sol.get_status()).replace('HxSolutionStatus.', '')
     result["objectives"] = [
-        {"name": "vehicles_used", "value": sol.get_value(vehicles_used_cnt), "bound": sol.get_objective_bound(0), "gap": sol.get_objective_gap(0)},
-        {"name": "total_distance", "value": sol.get_value(total_distance), "bound": sol.get_objective_bound(1), "gap": sol.get_objective_gap(1)}
+        {"name": "total_distance", "value": sol.get_value(total_distance), "bound": sol.get_objective_bound(0), "gap": sol.get_objective_gap(0)},
+        {"name": "vehicles_used", "value": sol.get_value(vehicles_used_cnt), "bound": sol.get_objective_bound(1), "gap": sol.get_objective_gap(1)}
         ]
     result["routes"] = []
     for k in range(vehicles_cnt):
         if vehicles_used[k].value:
             route = [station for station in routes[k].value]
-            leaving_load = [load for load in loads[k].value]
-            result["routes"].append({"route": route, "leaving_load": leaving_load})
+            result["routes"].append({"route": route})
     
     result_string = json.dumps(result, indent=4)
 
