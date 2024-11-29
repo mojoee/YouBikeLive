@@ -40,8 +40,18 @@ for rt in solution["routes"]:
             loads_merged.append(load)
     route_merged.reverse()
     loads_merged.reverse()
+    # print(route_merged)
+    # print(loads_merged)
+    rt["route"] = route_merged
+    rt["leaving_load"] = loads_merged
 
-    print(route_merged)
-    print(loads_merged)
 
-    # TODO check, export
+# Export
+instance_path_orig = instance_path.replace("_unit.json", ".json")
+solution["instance"] = instance_path_orig
+
+solution_path_new = solution_path.replace("_unit.json", ".json")
+
+with open(solution_path_new, "w") as outfile:
+    json.dump(solution, outfile, indent=4)
+    print("Exported solution", solution_path_new)
