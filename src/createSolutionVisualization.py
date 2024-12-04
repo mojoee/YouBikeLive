@@ -84,7 +84,7 @@ def visualize_tsp_paths(instance, tsp_routes, map_output="./results/visualizatio
 
 # Example usage
 instance_path = "./data/instances/instance_test_12:30.json"  # Path to the generated instance file
-solution_path = "./results/instance_test_12_30/v5_c100_20min.json"  # Path to the TSP solution file
+solution_path = "./results/instance_test_12_30/v5_c1000_20min.json"  # Path to the TSP solution file
 solution = solution_path.split('/')[-1].split('.')[0]
 instance = instance_path.split('/')[-1].split('.')[0]
 name = solution + instance
