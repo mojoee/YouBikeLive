@@ -135,3 +135,5 @@ if __name__ == "__main__":
             solution_path = sys.argv[i+1]
         elif sys.argv[i] == '-t':
             time_limit = int(sys.argv[i+1])
+
+    rebalance_v1_1(instance_path, solution_path, time_limit)

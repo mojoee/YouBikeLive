@@ -5,16 +5,19 @@ import os
 
 from generate_unit_instance import generate_unit_instance
 from process_unit_solution import process_unit_solution
+
+# Different rebalancing functions
+from rebalance_v1_1 import rebalance_v1_1
+from rebalance_v1_2 import rebalance_v1_2
 from rebalance_v1_2_minmax import rebalance_v1_2_minmax
 
 
 
 
-def rebalance_v2_minmax(instance_path, solution_path, time_limit, remove):
+def rebalance_unit(instance_path, solution_path, time_limit, remove, rebalancing_function):
     """
-    1) minimize max distance by a singe vehicle
-    Always use all vehicles.
-    Split loading and deliveries.
+    Applies given rebalancing function to unit instance. 
+    In effect achieving split loading and deliveries.
     """
 
     # 1) Generate unit instance
@@ -28,7 +31,7 @@ def rebalance_v2_minmax(instance_path, solution_path, time_limit, remove):
 
     # 2) Solve unit instance
     unit_solution_path = solution_path.replace(".json", "_unit.json")
-    rebalance_v1_2_minmax(unit_instance_path, unit_solution_path, time_limit)
+    rebalancing_function(unit_instance_path, unit_solution_path, time_limit)
 
     # 3) Process unit solution
     process_unit_solution(unit_instance_path, unit_solution_path)
@@ -45,9 +48,16 @@ def rebalance_v2_minmax(instance_path, solution_path, time_limit, remove):
 if __name__ == "__main__":
     # PARAMETERS
     instance_path = "./data/instances/demo.json"
-    solution_path = "./demo.json"
+    solution_path = "./results/demo.json"
     time_limit = 5
     remove = False
+    function_label = "v1_1"
+
+    function_map = {
+        "v1_1": rebalance_v1_1,
+        "v1_2": rebalance_v1_2,
+        "v1_2_minmax": rebalance_v1_2_minmax 
+    }
 
     for i in range(len(sys.argv)):
         if sys.argv[i] == '-i':
@@ -58,3 +68,8 @@ if __name__ == "__main__":
             time_limit = int(sys.argv[i+1])
         elif sys.argv[i] == '-r':
             remove = True
+        elif sys.argv[i] == '-f':
+            function_label = sys.argv[i+1]
+    rebalancing_function = function_map[function_label]
+
+    rebalance_unit(instance_path, solution_path, time_limit, remove, rebalancing_function)

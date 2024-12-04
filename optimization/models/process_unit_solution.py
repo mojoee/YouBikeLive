@@ -64,3 +64,5 @@ if __name__ == "__main__":
             instance_path = sys.argv[i+1]
         elif sys.argv[i] == '-s':
             solution_path = sys.argv[i+1]
+
+    process_unit_solution(instance_path, solution_path)
