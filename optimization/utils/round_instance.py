@@ -2,7 +2,7 @@
 
 import json
 
-instance_path = "data/instances/demo.json"
+instance_path = "data/instances_v1/demo.json"
 
 data = {}
 with open(instance_path, 'r') as file:

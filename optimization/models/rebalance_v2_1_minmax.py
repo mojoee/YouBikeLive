@@ -7,13 +7,13 @@ import json
 
 
 
-def rebalance_v1_2_minmax(instance_path, solution_path, time_limit):
+def rebalance_v2_1_minmax(instance_path, solution_path, time_limit):
     """
     1) minimize max distance by a singe vehicle
     Always use all vehicles.
     Everyone visited and served exactly once.
     """
-
+    
     # LOAD
     with open(instance_path, 'r') as file:
         data = json.load(file)
@@ -126,7 +126,7 @@ def rebalance_v1_2_minmax(instance_path, solution_path, time_limit):
 
 if __name__ == "__main__":
     # DEFAULT PARAMETERS
-    instance_path = "./data/instances_v1/demo.json"
+    instance_path = "./data/instances/demo.json"
     solution_path = "./demo.json"
     time_limit = 5
 
@@ -138,4 +138,4 @@ if __name__ == "__main__":
         elif sys.argv[i] == '-t':
             time_limit = int(sys.argv[i+1])
 
-    rebalance_v1_2_minmax(instance_path, solution_path, time_limit)
+    # rebalance_v1_2_minmax(instance_path, solution_path, time_limit)

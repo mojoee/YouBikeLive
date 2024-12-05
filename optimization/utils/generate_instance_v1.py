@@ -94,7 +94,7 @@ data = {
 
 data_string = json.dumps(data, indent=4)
 
-output_path = "./data/n" + str(STATIONS_CNT) + "-" + str(ST_MAX_CAPACITY) + "_v" + str(VEHICLES_CNT) + "-" + str(VEHICLES_CAPACITY) + ".json"
+output_path = "./data/instances_v1/n" + str(STATIONS_CNT) + "-" + str(ST_MAX_CAPACITY) + "_v" + str(VEHICLES_CNT) + "-" + str(VEHICLES_CAPACITY) + ".json"
 
 with open(output_path, "w") as outfile:
     outfile.write(data_string)
