@@ -17,7 +17,7 @@ def load_solution(solution_path):
     return solution['routes']  # Assuming the solution file contains a key 'routes'
 
 # Visualize the paths on a map
-def visualize_tsp_paths(instance, tsp_routes, map_output="./results/visualizations/tsp_map.html"):
+def visualize_tsp_paths(instance, tsp_routes, map_output="./results/visualizations/routes_map.html"):
     # Convert stations to a DataFrame for easy handling
     stations = pd.DataFrame(instance['stations'])
 
@@ -27,37 +27,6 @@ def visualize_tsp_paths(instance, tsp_routes, map_output="./results/visualizatio
     depot_coords = instance['depot']['coords']
     map_center = first_station['coords'][0], first_station['coords'][1]
     mymap = folium.Map(location=map_center, zoom_start=13)
-
-    # Add a FeatureGroup for station markers
-    marker_group = folium.FeatureGroup(name="Stations")
-
-    # Add smaller markers to the FeatureGroup
-    for _, row in stations.iterrows():
-        folium.CircleMarker(
-            location=row['coords'],  # Coordinates of the station
-            radius=5,                # Adjust radius for smaller markers
-            color="blue",            # Border color of the circle
-            fill=True,               # Fill the circle with color
-            fill_color="gray",       # Fill color of the circle
-            fill_opacity=0.7,        # Adjust transparency
-            tooltip=f"Station ID: {row['id']}"  # Tooltip on hover
-        ).add_to(marker_group)
-
-
-    # add the marker for the station
-    folium.CircleMarker(
-        location=depot_coords,  # Coordinates of the station
-        radius=15,                # Adjust radius for smaller markers
-        color="red",            # Border color of the circle
-        fill=True,               # Fill the circle with color
-        fill_color="gray",       # Fill color of the circle
-        fill_opacity=0.7,        # Adjust transparency
-        tooltip="Depot"  # Tooltip on hover
-    ).add_to(marker_group)
-
-
-    # Add the FeatureGroup to the map
-    marker_group.add_to(mymap)
 
     # Generate a color palette for the routes
     num_routes = len(tsp_routes)
@@ -71,9 +40,40 @@ def visualize_tsp_paths(instance, tsp_routes, map_output="./results/visualizatio
         path_coordinates.insert(0, depot_coords)
         path_coordinates.append(depot_coords)
         folium.PolyLine(
-            path_coordinates, color=route_colors[idx], weight=4, opacity=1,
+            path_coordinates, color=route_colors[idx], weight=2, opacity=1,
             tooltip=f"Route {idx + 1}"
         ).add_to(mymap)
+
+    # Add a FeatureGroup for station markers
+    marker_group = folium.FeatureGroup(name="Stations")
+
+    # Add smaller markers to the FeatureGroup
+    for _, row in stations.iterrows():
+        folium.CircleMarker(
+            location=row['coords'],  # Coordinates of the station
+            radius=1,                # Adjust radius for smaller markers
+            color="blue",            # Border color of the circle
+            fill=True,               # Fill the circle with color
+            fill_color="blue",       # Fill color of the circle
+            fill_opacity=0.5,        # Adjust transparency
+            tooltip=f"Station ID: {row['id']}"  # Tooltip on hover
+        ).add_to(marker_group)
+
+
+    # add the marker for the station
+    folium.CircleMarker(
+        location=depot_coords,  # Coordinates of the station
+        radius=3,                # Adjust radius for smaller markers
+        color="red",            # Border color of the circle
+        fill=True,               # Fill the circle with color
+        fill_color="red",       # Fill color of the circle
+        fill_opacity=0.5,        # Adjust transparency
+        tooltip="Depot"  # Tooltip on hover
+    ).add_to(marker_group)
+
+
+    # Add the FeatureGroup to the map
+    marker_group.add_to(mymap)
 
     # Add LayerControl to enable toggling
     folium.LayerControl().add_to(mymap)
@@ -83,12 +83,15 @@ def visualize_tsp_paths(instance, tsp_routes, map_output="./results/visualizatio
     print(f"Map saved as '{map_output}'")
 
 # Example usage
+<<<<<<< HEAD
 instance_path = "./data/instances/instance_test_12:30.json"  # Path to the generated instance file
 solution_path = "./results/instance_test_12_30/v5_c1000_20min.json"  # Path to the TSP solution file
+=======
+instance_path = "./data/instances/instance_test_12:30_v5_c20.json"  # Path to the generated instance file
+solution_path = "./results/v2_minmax/instance_test_12:30_v5_c20_12h.json"  # Path to the TSP solution file
+>>>>>>> 4bb5c8ea1899c2bd4e8d1da05b55a05aadb974b4
 solution = solution_path.split('/')[-1].split('.')[0]
-instance = instance_path.split('/')[-1].split('.')[0]
-name = solution + instance
-save_path = f"./results/visualizations/{name}_tsp_map.html"
+save_path = f"./results/visualizations/v2_minmax/{solution}.html"
 
 # Load instance and solution
 instance = load_instance(instance_path)
