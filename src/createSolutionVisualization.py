@@ -83,13 +83,8 @@ def visualize_tsp_paths(instance, tsp_routes, map_output="./results/visualizatio
     print(f"Map saved as '{map_output}'")
 
 # Example usage
-<<<<<<< HEAD
-instance_path = "./data/instances/instance_test_12:30.json"  # Path to the generated instance file
-solution_path = "./results/instance_test_12_30/v5_c1000_20min.json"  # Path to the TSP solution file
-=======
 instance_path = "./data/instances/instance_test_12:30_v5_c20.json"  # Path to the generated instance file
 solution_path = "./results/v2_minmax/instance_test_12:30_v5_c20_12h.json"  # Path to the TSP solution file
->>>>>>> 4bb5c8ea1899c2bd4e8d1da05b55a05aadb974b4
 solution = solution_path.split('/')[-1].split('.')[0]
 save_path = f"./results/visualizations/v2_minmax/{solution}.html"
 
