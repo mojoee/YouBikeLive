@@ -1,0 +1,40 @@
+{
+    "instance": "./data/instances_v1/demo.json",
+    "time_limit": 5,
+    "running_time": 0,
+    "status": "OPTIMAL",
+    "objectives": [
+        {
+            "name": "vehicles_used",
+            "value": 1,
+            "bound": 1,
+            "gap": 0.0
+        },
+        {
+            "name": "total_distance",
+            "value": 11,
+            "bound": 11,
+            "gap": 0.0
+        }
+    ],
+    "routes": [
+        {
+            "route": [
+                3,
+                4,
+                3,
+                1,
+                0,
+                2
+            ],
+            "leaving_load": [
+                4,
+                16,
+                20,
+                13,
+                5,
+                0
+            ]
+        }
+    ]
+}
