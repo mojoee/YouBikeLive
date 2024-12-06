@@ -80,7 +80,7 @@ for i in range(DEPOTS_CNT):
     depot_coords = np.array(depot["coords"])
     for station in stations:
         station_coords = np.array(station["coords"])
-        dist = np.linalg.norm(depot_coords - station_coords)
+        dist = int(np.linalg.norm(depot_coords - station_coords))
         dtd.append(dist)
     depot["dists_from_depot"] = dtd
     depot["dists_to_depot"] = dtd

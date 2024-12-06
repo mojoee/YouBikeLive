@@ -14,87 +14,89 @@ def rebalance_v2_1_minmax(instance_path, solution_path, time_limit):
     Everyone visited and served exactly once.
     """
     
-    # LOAD
+    # LOAD DATA
     with open(instance_path, 'r') as file:
         data = json.load(file)
 
     data["stations"].sort(key = lambda x:x["id"])
+    data["depots"].sort(key = lambda x:x["id"])
+    data["vehicles"].sort(key = lambda x:x["id"])
 
     stations_cnt = len(data["stations"])
     demands_data = [station["s_goal"] - station["s_init"] for station in data["stations"]]
-    vehicles_cnt = data["vehicles"]["count"]
-    vehicles_capacity = data["vehicles"]["capacity"]
     dist_matrix_data = data["distances"]
-    dist_from_depot_data = data["depot"]["dists_from_depot"]
-    dist_to_depot_data = data["depot"]["dists_to_depot"]
+    vehicles_cnt = len(data["vehicles"])
+    vehicles_capacities = [v["capacity"] for v in data["vehicles"]]
+    vehicles_depots = [v["depot_id"] for v in data["vehicles"]]
+    depots_cnt = len(data["depots"])
+    dist_from_depots_data = [d["dists_from_depot"] for d in data["depots"]]
+    dist_to_depots_data = [d["dists_to_depot"] for d in data["depots"]]
 
     print("Solving", instance_path)
     print("stations_cnt:", stations_cnt)
     print("demand_min:", min(demands_data))
     print("demand_max", max(demands_data))
-    print("venicles_capacity:", vehicles_capacity)
     print("vehicles_cnt:", vehicles_cnt)
-
+    print("vehicles_capacities:", vehicles_capacities)
+    print("vehicles_depots", vehicles_depots)
+    print("depots_cnt:", depots_cnt)
+    print()
 
     # MODEL
     with hexaly.optimizer.HexalyOptimizer() as optimizer:
         model = optimizer.model
+
         # Create Hexaly arrays to be able to access them with an "at" operator
         demands = model.array(demands_data)
         dist_matrix = model.array(dist_matrix_data)
-        dist_from_depot = model.array(dist_from_depot_data)
-        dist_to_depot = model.array(dist_to_depot_data)
+        dist_from_depots = [model.array(d) for d in dist_from_depots_data]
+        dist_to_depots = [model.array(d) for d in dist_to_depots_data]
 
         # DECISION VARIABLES 
         routes = [model.list(stations_cnt) for _ in range(vehicles_cnt)] # Sequence of stations visited by each vehicle
+
+        # INTERMEDIATE EXPRESSIONS
         loads = [None] * vehicles_cnt # current vehicle loads at each station
-
-        # CONSTRAINTS
-        # All customers must be visited by exactly one vehicle
-        model.constraint(model.partition(routes))
-
-        # A vehicle is used if it visits at least one customer
-        vehicles_used = [(model.count(routes[k]) > 0) for k in range(vehicles_cnt)]
-
+        vehicles_used = [(model.count(routes[k]) > 0) for k in range(vehicles_cnt)] # A vehicle is used if it visits at least one customer
         routes_lens = [None] * vehicles_cnt
+
+        # CONSTRAINT 1
+        model.constraint(model.partition(routes)) # All customers must be visited by exactly one vehicle
+
         for k in range(vehicles_cnt):
             route = routes[k]
             c = model.count(route)
 
-            # Vehicle loads must be non-negative and within vehicle capacity at all times
+            # Leaving load at each station visited by vehicle k
             demand_lambda = model.lambda_function(lambda i, prev: prev - demands[route[i]])
             loads[k] = model.array(model.range(0, c), demand_lambda, 0)
 
             # Constraint on min and max vehicle capacity
-            max_quantity_lambda = model.lambda_function(lambda i: loads[k][i] <= vehicles_capacity)
-            model.constraint(model.and_(model.range(0, c), max_quantity_lambda))
-
+            max_quantity_lambda = model.lambda_function(lambda i: loads[k][i] <= vehicles_capacities[k])
             min_quantity_lambda = model.lambda_function(lambda i: loads[k][i] >= 0)
+            model.constraint(model.and_(model.range(0, c), max_quantity_lambda))
             model.constraint(model.and_(model.range(0, c), min_quantity_lambda))
 
             # Distance traveled by each vehicle
             dist_lambda = model.lambda_function(lambda i: model.at(dist_matrix, route[i - 1], route[i]))
-            routes_lens[k] = model.sum(model.range(1, c), dist_lambda) + model.iif(c > 0, dist_from_depot[route[0]] + dist_to_depot[route[c - 1]], 0)
+            depot_id = vehicles_depots[k]
+            routes_lens[k] = model.sum(model.range(1, c), dist_lambda) + model.iif(c > 0, dist_from_depots[depot_id][route[0]] + dist_to_depots[depot_id][route[c - 1]], 0)
 
         # Total number of vehicles
         vehicles_used_cnt = model.sum(vehicles_used)
-        model.constraint(vehicles_used_cnt == vehicles_cnt)
+        # model.constraint(vehicles_used_cnt == vehicles_cnt)
 
         # OBJECTIVES
         # Total distance traveled
         max_distance = model.max(routes_lens)
 
-        # Objective: minimize the number of vehicles used, then minimize the distance traveled
+        # Objective: minimize the distance traveled
         model.minimize(max_distance)
         model.close()
-
 
         # SOLVE
         optimizer.param.time_limit = time_limit
         optimizer.solve()
-
-
-
 
         # OUTPUT
         result = {}
@@ -124,10 +126,12 @@ def rebalance_v2_1_minmax(instance_path, solution_path, time_limit):
 
 
 
+
+
 if __name__ == "__main__":
     # DEFAULT PARAMETERS
-    instance_path = "./data/instances/demo.json"
-    solution_path = "./demo.json"
+    instance_path = "./data/instances_v2/n10_v4_d2.json"
+    solution_path = "./results/v2-1_minmax/demo.json"
     time_limit = 5
 
     for i in range(len(sys.argv)):
@@ -138,4 +142,4 @@ if __name__ == "__main__":
         elif sys.argv[i] == '-t':
             time_limit = int(sys.argv[i+1])
 
-    # rebalance_v1_2_minmax(instance_path, solution_path, time_limit)
+    rebalance_v2_1_minmax(instance_path, solution_path, time_limit)

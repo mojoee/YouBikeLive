@@ -84,7 +84,7 @@ def rebalance_v1_2_minmax(instance_path, solution_path, time_limit):
         # Total distance traveled
         max_distance = model.max(routes_lens)
 
-        # Objective: minimize the number of vehicles used, then minimize the distance traveled
+        # Objective: minimize the distance traveled
         model.minimize(max_distance)
         model.close()
 
