@@ -13,7 +13,7 @@ def rebalance_v1_2_minmax(instance_path, solution_path, time_limit):
     Always use all vehicles.
     Everyone visited and served exactly once.
     """
-    
+
     # LOAD
     with open(instance_path, 'r') as file:
         data = json.load(file)
@@ -84,7 +84,7 @@ def rebalance_v1_2_minmax(instance_path, solution_path, time_limit):
         # Total distance traveled
         max_distance = model.max(routes_lens)
 
-        # Objective: minimize the number of vehicles used, then minimize the distance traveled
+        # Objective: minimize the distance traveled
         model.minimize(max_distance)
         model.close()
 
@@ -126,7 +126,7 @@ def rebalance_v1_2_minmax(instance_path, solution_path, time_limit):
 
 if __name__ == "__main__":
     # DEFAULT PARAMETERS
-    instance_path = "./data/instances/demo.json"
+    instance_path = "./data/instances_v1/demo.json"
     solution_path = "./demo.json"
     time_limit = 5
 

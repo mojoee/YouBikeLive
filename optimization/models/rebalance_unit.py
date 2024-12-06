@@ -47,7 +47,7 @@ def rebalance_unit(instance_path, solution_path, time_limit, remove, rebalancing
 
 if __name__ == "__main__":
     # PARAMETERS
-    instance_path = "./data/instances/demo.json"
+    instance_path = "./data/instances_v1/demo.json"
     solution_path = "./results/demo.json"
     time_limit = 5
     remove = False
@@ -56,7 +56,7 @@ if __name__ == "__main__":
     function_map = {
         "v1_1": rebalance_v1_1,
         "v1_2": rebalance_v1_2,
-        "v1_2_minmax": rebalance_v1_2_minmax 
+        "v1_2_minmax": rebalance_v1_2_minmax
     }
 
     for i in range(len(sys.argv)):
@@ -73,3 +73,5 @@ if __name__ == "__main__":
     rebalancing_function = function_map[function_label]
 
     rebalance_unit(instance_path, solution_path, time_limit, remove, rebalancing_function)
+
+# python3 ./optimization/models/rebalance_unit.py -i data/instances_v1/instance_test_12:30_v5_c20.json -o ./results/unit_v1-1/instance_test_12:30_v5_c20_1min.json -t 60 -f v1_1

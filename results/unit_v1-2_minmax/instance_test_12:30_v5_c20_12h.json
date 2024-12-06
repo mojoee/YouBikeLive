@@ -1,5 +1,5 @@
 {
-    "instance": "./data/instances/instance_test_12:30_c20.json",
+    "instance": "./data/instances_v1/instance_test_12:30_c20.json",
     "time_limit": 43200,
     "running_time": 43200,
     "status": "FEASIBLE",
