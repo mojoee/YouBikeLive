@@ -113,10 +113,9 @@ def rebalance_v2_1_minmax(instance_path, solution_path, time_limit):
             ]
         result["routes"] = []
         for k in range(vehicles_cnt):
-            if vehicles_used[k].value:
-                route = [station for station in routes[k].value]
-                leaving_load = [load for load in loads[k].value]
-                result["routes"].append({"route": route, "leaving_load": leaving_load})
+            route = [station for station in routes[k].value]
+            leaving_load = [load for load in loads[k].value]
+            result["routes"].append({"route": route, "leaving_load": leaving_load})
         
         result_string = json.dumps(result, indent=4)
 
@@ -132,7 +131,7 @@ def rebalance_v2_1_minmax(instance_path, solution_path, time_limit):
 if __name__ == "__main__":
     # DEFAULT PARAMETERS
     instance_path = "./data/instances_v2/n10_v4_d2.json"
-    solution_path = "./results/v2-1_minmax/demo.json"
+    solution_path = "./results/v2-1_minmax/n10_v4_d2.json"
     time_limit = 5
 
     for i in range(len(sys.argv)):
