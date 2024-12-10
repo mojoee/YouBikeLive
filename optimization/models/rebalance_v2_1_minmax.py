@@ -12,6 +12,7 @@ def rebalance_v2_1_minmax(instance_path, solution_path, time_limit):
     1) minimize max distance by a singe vehicle
     Always use all vehicles.
     Everyone visited and served exactly once.
+    Considers multiple depots and vehicles with different capacities.
     """
     
     # LOAD DATA

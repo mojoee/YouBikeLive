@@ -3,7 +3,7 @@
 import sys
 import os
 
-from generate_unit_instance import generate_unit_instance
+from generate_unit_instance import generate_unit_instance_v1
 from process_unit_solution import process_unit_solution
 
 # Different rebalancing functions
@@ -27,7 +27,7 @@ def rebalance_unit(instance_path, solution_path, time_limit, remove, rebalancing
         print("Unit instance already exists:", unit_instance_path)
     else:
         print("Generating unit instance:", unit_instance_path, " . . . ")
-        generate_unit_instance(instance_path, unit_instance_path)
+        generate_unit_instance_v1(instance_path, unit_instance_path)
 
     # 2) Solve unit instance
     unit_solution_path = solution_path.replace(".json", "_unit.json")
