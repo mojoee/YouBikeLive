@@ -9,11 +9,11 @@ import json
 
 def rebalance_v3_1_minmax(instance_path, solution_path, time_limit):
     """
-    1) minimize max distance by a singe vehicle
-    Always use all vehicles.
+    1) minimize max trip duration of a singe vehicle.
+    Trip duration = travel time + loading time * parking time.
+    Limited max trip duration.
     Everyone visited and served exactly once.
     Considers multiple depots and vehicles with different capacities.
-
     """
     
     # LOAD DATA
@@ -72,7 +72,7 @@ def rebalance_v3_1_minmax(instance_path, solution_path, time_limit):
         # INTERMEDIATE EXPRESSIONS
         loads = [None] * vehicles_cnt # current vehicle loads at each station
         vehicles_used = [(model.count(routes[k]) > 0) for k in range(vehicles_cnt)] # A vehicle is used if it visits at least one customer
-        routes_lens = [None] * vehicles_cnt
+        routes_costs = [None] * vehicles_cnt
 
         # CONSTRAINT 1
         model.constraint(model.partition(routes)) # All customers must be visited by exactly one vehicle
@@ -87,28 +87,30 @@ def rebalance_v3_1_minmax(instance_path, solution_path, time_limit):
 
             # Constraint on min and max vehicle capacity
             max_quantity_lambda = model.lambda_function(lambda i: loads[k][i] <= vehicles_capacities[k])
-            min_quantity_lambda = model.lambda_function(lambda i: loads[k][i] >= 0)
             model.constraint(model.and_(model.range(0, c), max_quantity_lambda))
+
+            min_quantity_lambda = model.lambda_function(lambda i: loads[k][i] >= 0)
             model.constraint(model.and_(model.range(0, c), min_quantity_lambda))
 
             # Distance traveled by each vehicle
             dist_lambda = model.lambda_function(lambda i: model.at(dist_matrix, route[i - 1], route[i]))
-            loading_lambda = model.lambda_function(lambda i: loading_time * abs(model.at(demands, route[i])))
             depot_id = vehicles_depots[k]
-            routes_lens[k] = model.sum(model.range(1, c), dist_lambda) + model.iif(c > 0, dist_from_depots[depot_id][route[0]] + dist_to_depots[depot_id][route[c - 1]], 0) + model.sum(model.range(0, c), loading_lambda)
-            model.constraint(routes_lens[k] <= max_trip_duration)
+            travel_cost = model.sum(model.range(1, c), dist_lambda) + model.iif(c > 0, dist_from_depots[depot_id][route[0]] + dist_to_depots[depot_id][route[c - 1]], 0)
 
-            parking_lambda = model.lambda_function(lambda i: parking_time * (model.at(stations_parents, route[i - 1]) == model.at(stations_parents, route[i])))
-            parking = model.sum(model.range(1, c), parking_lambda)
+            loading_lambda = model.lambda_function(lambda i: loading_time * abs(model.at(demands, route[i])))
+            loading_cost = model.sum(model.range(0, c), loading_lambda)
 
+            parking_lambda = model.lambda_function(lambda i: parking_time * (model.at(stations_parents, route[i - 1]) != model.at(stations_parents, route[i])))
+            parking_cost = model.sum(model.range(1, c), parking_lambda) + model.iif(c > 0, parking_time, 0)
 
-        # Total number of vehicles
-        vehicles_used_cnt = model.sum(vehicles_used)
-        # model.constraint(vehicles_used_cnt == vehicles_cnt)
+            routes_costs[k] = travel_cost + loading_cost + parking_cost
+
+            # Contraint on total trip duration
+            model.constraint(routes_costs[k] <= max_trip_duration)
 
         # OBJECTIVES
         # Total distance traveled
-        max_distance = model.max(routes_lens)
+        max_distance = model.max(routes_costs)
 
         # Objective: minimize the distance traveled
         model.minimize(max_distance)
@@ -134,7 +136,7 @@ def rebalance_v3_1_minmax(instance_path, solution_path, time_limit):
         for k in range(vehicles_cnt):
             route = [station for station in routes[k].value]
             leaving_load = [load for load in loads[k].value]
-            result["routes"].append({"length": routes_lens[k].value, "route": route, "leaving_load": leaving_load})
+            result["routes"].append({"length": routes_costs[k].value, "route": route, "leaving_load": leaving_load})
         
         result_string = json.dumps(result, indent=4)
 
@@ -148,9 +150,9 @@ def rebalance_v3_1_minmax(instance_path, solution_path, time_limit):
 
 if __name__ == "__main__":
     # DEFAULT PARAMETERS
-    instance_path = "./data/instances_v3/n10_v4_d2_unit.json"
-    solution_path = "./results/v3-1_minmax/n10_v4_d2_unit.json"
-    time_limit = 5
+    instance_path = "./data/instances_v3/n10_v4_d2.json"
+    solution_path = "./results/v3-1_minmax/n10_v4_d2.json"
+    time_limit = 60
 
     for i in range(len(sys.argv)):
         if sys.argv[i] == '-i':
