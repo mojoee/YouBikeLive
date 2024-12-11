@@ -1,0 +1,70 @@
+{
+    "instance": "./data/instances_v3/n10_v4_d2_p0_l0.json",
+    "time_limit": 60,
+    "running_time": 60,
+    "status": "FEASIBLE",
+    "objectives": [
+        {
+            "name": "max_distance",
+            "value": 1603,
+            "bound": 0,
+            "gap": 1.0
+        }
+    ],
+    "routes": [
+        {
+            "length": 1595,
+            "route": [
+                6,
+                8,
+                7
+            ],
+            "leaving_load": [
+                4,
+                1,
+                0
+            ]
+        },
+        {
+            "length": 1596,
+            "route": [
+                0,
+                5,
+                7,
+                3
+            ],
+            "leaving_load": [
+                10,
+                13,
+                9,
+                0
+            ]
+        },
+        {
+            "length": 1381,
+            "route": [
+                2,
+                1,
+                4,
+                8
+            ],
+            "leaving_load": [
+                3,
+                0,
+                2,
+                0
+            ]
+        },
+        {
+            "length": 1603,
+            "route": [
+                5,
+                9
+            ],
+            "leaving_load": [
+                17,
+                0
+            ]
+        }
+    ]
+}
