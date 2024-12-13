@@ -3,20 +3,19 @@
 import hexaly.optimizer
 import sys
 import json
+import os
 
 
 
-
-def rebalance_v3_1_minmax(instance_path, solution_path, time_limit):
+def rebalance_v4(instance_path, solution_path, time_limit):
     """
-    1) minimize max trip duration of a singe vehicle.
-    Trip duration = travel time + loading time * parking time.
-    Limited max trip duration.
-    Everyone served at most once.
+    1) Maximize cumulative reward for rebalancing.
+    Limited trip duration = travel time + loading time * parking time.
+    Everyone visited and served exactly once.
     Considers multiple depots and vehicles with different capacities.
     """
-    
-    # LOAD DATA
+
+        # LOAD DATA
     with open(instance_path, 'r') as file:
         data = json.load(file)
 
@@ -26,26 +25,32 @@ def rebalance_v3_1_minmax(instance_path, solution_path, time_limit):
 
     stations_cnt = len(data["stations"])
     demands_data = [station["s_goal"] - station["s_init"] for station in data["stations"]]
-    dist_matrix_data = data["distances"]
-    vehicles_cnt = len(data["vehicles"])
-    vehicles_capacities = [v["capacity"] for v in data["vehicles"]]
-    vehicles_depots = [v["depot_id"] for v in data["vehicles"]]
-    depots_cnt = len(data["depots"])
-    dist_from_depots_data = [d["dists_from_depot"] for d in data["depots"]]
-    dist_to_depots_data = [d["dists_to_depot"] for d in data["depots"]]
-    parking_time = data["constants"]["parking_time"]
-    loading_time = data["constants"]["loading_time"]
-    max_trip_duration = data["constants"]["max_trip_duration"]
+    rewards_data = [station["c_reward"] for station in data["stations"]]
     stations_parents_data = []
     if "parent_id" in data["stations"][0]:
         stations_parents_data = [st["parent_id"] for st in data["stations"]]
     else:
         stations_parents_data = [i for i in range(stations_cnt)]
 
+    dist_matrix_data = data["distances"]
+    
+    vehicles_cnt = len(data["vehicles"])
+    vehicles_capacities = [v["capacity"] for v in data["vehicles"]]
+    vehicles_depots = [v["depot_id"] for v in data["vehicles"]]
+    
+    depots_cnt = len(data["depots"])
+    dist_from_depots_data = [d["dists_from_depot"] for d in data["depots"]]
+    dist_to_depots_data = [d["dists_to_depot"] for d in data["depots"]]
+    
+    parking_time = data["constants"]["parking_time"]
+    loading_time = data["constants"]["loading_time"]
+    max_trip_duration = data["constants"]["max_trip_duration"]
+
     print("Solving", instance_path)
     print("stations_cnt:", stations_cnt)
     print("demand_min:", min(demands_data))
     print("demand_max", max(demands_data))
+    print("demands", demands_data)
     print("vehicles_cnt:", vehicles_cnt)
     print("vehicles_capacities:", vehicles_capacities)
     print("vehicles_depots", vehicles_depots)
@@ -55,12 +60,13 @@ def rebalance_v3_1_minmax(instance_path, solution_path, time_limit):
     print("max_trip_duration:", max_trip_duration)
     print()
 
-    # MODEL
+        # MODEL
     with hexaly.optimizer.HexalyOptimizer() as optimizer:
         model = optimizer.model
 
         # Create Hexaly arrays to be able to access them with an "at" operator
         demands = model.array(demands_data)
+        rewards = model.array(rewards_data)
         dist_matrix = model.array(dist_matrix_data)
         dist_from_depots = [model.array(d) for d in dist_from_depots_data]
         dist_to_depots = [model.array(d) for d in dist_to_depots_data]
@@ -72,9 +78,10 @@ def rebalance_v3_1_minmax(instance_path, solution_path, time_limit):
         # INTERMEDIATE EXPRESSIONS
         loads = [None] * vehicles_cnt # current vehicle loads at each station
         routes_costs = [None] * vehicles_cnt
+        routes_rewards = [None] * vehicles_cnt
 
         # CONSTRAINT 1
-        model.constraint(model.partition(routes)) # All customers must be visited by exactly one vehicle
+        model.constraint(model.disjoint(routes)) # All customers must be visited at most once
 
         for k in range(vehicles_cnt):
             route = routes[k]
@@ -104,15 +111,20 @@ def rebalance_v3_1_minmax(instance_path, solution_path, time_limit):
 
             routes_costs[k] = travel_cost + loading_cost + parking_cost
 
+            reward_lambda = model.lambda_function(lambda i: model.at(rewards, route[i]) * abs(model.at(demands, route[i])))
+            routes_rewards[k] = model.sum(model.range(0, c), reward_lambda)
+
             # Contraint on total trip duration
             model.constraint(routes_costs[k] <= max_trip_duration)
 
         # OBJECTIVES
-        # Total distance traveled
-        max_distance = model.max(routes_costs)
+        # 1) Maximize cumulative reward
+        total_reward = model.sum(routes_rewards)
+        model.maximize(total_reward)
+        # 2) Minimize total trip duration
+        max_duration = model.max(routes_costs)
+        model.minimize(max_duration)
 
-        # Objective: minimize the distance traveled
-        model.minimize(max_distance)
         model.close()
 
         # SOLVE
@@ -129,14 +141,14 @@ def rebalance_v3_1_minmax(instance_path, solution_path, time_limit):
         result["running_time"] = optimizer.get_statistics().get_running_time()
         result["status"] = str(sol.get_status()).replace('HxSolutionStatus.', '')
         result["objectives"] = [
-            {"name": "max_distance", "value": sol.get_value(max_distance), "bound": sol.get_objective_bound(0), "gap": sol.get_objective_gap(0)}
+            {"name": "total_reward", "value": sol.get_value(total_reward), "bound": sol.get_objective_bound(0), "gap": sol.get_objective_gap(0)},
+            {"name": "max_duration", "value": sol.get_value(max_duration), "bound": sol.get_objective_bound(1), "gap": sol.get_objective_gap(1)}
             ]
         result["routes"] = []
         for k in range(vehicles_cnt):
             route = [station for station in routes[k].value]
             leaving_load = [load for load in loads[k].value]
-            result["routes"].append({"length": routes_costs[k].value, "route": route, "leaving_load": leaving_load})
-        
+            result["routes"].append({"reward": routes_rewards[k].value, "duration": routes_costs[k].value, "route": route, "leaving_load": leaving_load})        
         result_string = json.dumps(result, indent=4)
 
         with open(solution_path, "w") as outfile:
@@ -146,12 +158,15 @@ def rebalance_v3_1_minmax(instance_path, solution_path, time_limit):
 
 
 
-
 if __name__ == "__main__":
     # DEFAULT PARAMETERS
-    instance_path = "./data/instances_v3/n10_v4_d2.json"
-    solution_path = "./results/v3-1_minmax/n10_v4_d2.json"
-    time_limit = 60
+    instance_path = "./data/instances_v4/n10_v4_d2.json"
+    solution_dir = "./results/v4/"
+    time_limit = 30
+
+    name = instance_path.split('/')[-1]
+    solution_path = solution_dir + name
+    os.makedirs(solution_dir, exist_ok=True)
 
     for i in range(len(sys.argv)):
         if sys.argv[i] == '-i':
@@ -161,4 +176,4 @@ if __name__ == "__main__":
         elif sys.argv[i] == '-t':
             time_limit = int(sys.argv[i+1])
 
-    rebalance_v3_1_minmax(instance_path, solution_path, time_limit)
+    rebalance_v4(instance_path, solution_path, time_limit)
