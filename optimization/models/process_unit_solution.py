@@ -56,8 +56,8 @@ def process_unit_solution(instance_path, solution_path):
 
 if __name__ == "__main__":
     # PARAMETERS
-    instance_path = "./data/instances_v1/demo_unit.json"
-    solution_path = "./results/demo_unit.json"
+    instance_path = "./data/instances_v2/n10_v4_d2_unit.json"
+    solution_path = "./results/unit_v2-1_minmax/n10_v4_d2_unit.json"
 
     for i in range(len(sys.argv)):
         if sys.argv[i] == '-i':
