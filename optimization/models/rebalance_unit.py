@@ -3,7 +3,7 @@
 import sys
 import os
 
-from generate_unit_instance import generate_unit_instance_v1, generate_unit_instance_v2, generate_unit_instance_v3
+from generate_unit_instance import generate_unit_instance_v1, generate_unit_instance_v2, generate_unit_instance_v3, generate_unit_instance_v4
 from process_unit_solution import process_unit_solution
 
 # Different rebalancing functions
@@ -12,13 +12,15 @@ from rebalance_v1_2 import rebalance_v1_2
 from rebalance_v1_2_minmax import rebalance_v1_2_minmax
 from rebalance_v2_1_minmax import rebalance_v2_1_minmax
 from rebalance_v3_1_minmax import rebalance_v3_1_minmax
+from rebalance_v4 import rebalance_v4
 
 rebalancing_map = {
     "v1_1": rebalance_v1_1,
     "v1_2": rebalance_v1_2,
-    "v1_2_minmax": rebalance_v1_2_minmax, 
-    "v2_1_minmax": rebalance_v2_1_minmax, 
-    "v3_1_minmax": rebalance_v3_1_minmax
+    "v1_2_minmax": rebalance_v1_2_minmax,
+    "v2_1_minmax": rebalance_v2_1_minmax,
+    "v3_1_minmax": rebalance_v3_1_minmax,
+    "v4": rebalance_v4
 }
 
 unit_instance_generator_map = {
@@ -26,7 +28,8 @@ unit_instance_generator_map = {
     "v1_2": generate_unit_instance_v1,
     "v1_2_minmax": generate_unit_instance_v1, 
     "v2_1_minmax": generate_unit_instance_v2,
-    "v3_1_minmax":generate_unit_instance_v3
+    "v3_1_minmax":generate_unit_instance_v3,
+    "v4": generate_unit_instance_v4
 }
 
 
@@ -65,11 +68,15 @@ def rebalance_unit(instance_path, solution_path, time_limit, remove, rebalancing
 
 if __name__ == "__main__":
     # PARAMETERS
-    instance_path = "./data/instances_v3/n10_v4_d2_p0_l1.json"
-    solution_path = "./results/unit_v3-1_minmax/n10_v4_d2_p0_l1.json"
-    time_limit = 120
+    instance_path = "./data/instances_v4/n10_v4_d2.json"
+    solution_dir = "./results/unit_v4/"
+    time_limit = 30
     remove = False
-    function_label = "v3_1_minmax"
+    function_label = "v4"
+
+    name = instance_path.split('/')[-1]
+    solution_path = solution_dir + name
+    os.makedirs(solution_dir, exist_ok=True)
 
     for i in range(len(sys.argv)):
         if sys.argv[i] == '-i':
