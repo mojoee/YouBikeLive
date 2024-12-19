@@ -20,7 +20,7 @@ def get_coordinates_from_db():
     """
     with sqlite3.connect(DB_PATH) as conn:
         cursor = conn.cursor()
-        cursor.execute("SELECT sno, snaen, longitude, latitude FROM youbike_data")
+        cursor.execute("SELECT sno, snaen, longitude, latitude FROM youbike_stations ORDER BY youbike_stations.sno;")
         coordinates = cursor.fetchall()  # Returns a list of tuples [(lon, lat), ...]
 
     unique_coordinates = list(set(coordinates))
@@ -56,7 +56,6 @@ def make_osrm_request(coordinates):
 if __name__ == "__main__":
     # Step 1: Fetch coordinates from the database
     coordinates = get_coordinates_from_db()
-    coordinates.append(('000000000', 'depot', 121.53300, 25.02000))
     if len(coordinates) < 2:
         print("Not enough coordinates to calculate a route. At least two are required.")
         exit()
