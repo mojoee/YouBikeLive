@@ -12,54 +12,73 @@ from config import cfg
 # Configuration
 # ---------------------------------------
 db_path = "./youbike_data.db"
-time_of_interest = cfg.instance_time
+time_of_interest_start = cfg.instance_time_start
+time_of_interest_end = cfg.instance_time_end
 output_dir = "./data/instances"
 os.makedirs(output_dir, exist_ok=True)
 
-def fetch_stations(time_of_interest):
+default_station = {
+    "sno": "unknown_sno",
+    "snaen": "Unknown Station",
+    "sareaen": "Unknown District",
+    "latitude": 0.0,
+    "longitude": 0.0,
+    "capacity": 10,
+    "s_init": 0,
+    "s_goal": 0,
+    "coords": [0.0, 0.0],
+    "predicted_demand": [0] * 24  # 24 hours of zero demand
+}
+
+def fetch_stations(start_time, end_time):
+    """
+    Fetch and group station data over a specified time period.
+
+    Args:
+        start_time (str): Start time in '%H:%M' format.
+        end_time (str): End time in '%H:%M' format.
+
+    Returns:
+        pd.DataFrame: Grouped and aggregated station data.
+    """
     conn = sqlite3.connect(db_path)
+    
     query = f"""
-    WITH RankedStations AS (
-        SELECT 
-            sno, 
-            snaen, 
-            latitude, 
-            longitude, 
-            total AS capacity, 
-            available_rent_bikes AS s_init, 
-            mday,
-            ROW_NUMBER() OVER (PARTITION BY sno ORDER BY mday ASC) AS rank
-        FROM youbike_data
-        WHERE strftime('%H:%M', mday) >= '{time_of_interest}'
-    )
     SELECT 
         sno, 
         snaen, 
-        latitude, 
+        sareaen, 
+        latitude,
         longitude, 
-        capacity, 
-        s_init, 
-        mday
-    FROM RankedStations
-    WHERE rank = 1
+        total AS capacity, 
+        AVG(available_rent_bikes) AS avg_s_init, 
+        MAX(mday) AS last_update_time
+    FROM youbike_data
+    WHERE strftime('%H:%M', mday) BETWEEN '{start_time}' AND '{end_time}'
+    GROUP BY sno, snaen, sareaen, latitude, longitude, capacity
+    ORDER BY sno;
     """
     df = pd.read_sql_query(query, conn)
     conn.close()
+    
+    # Rename aggregated columns for clarity
+    df.rename(columns={"avg_s_init": "s_init"}, inplace=True)
+    
     return df
 
-df_stations = fetch_stations(time_of_interest)
+df_stations = fetch_stations(time_of_interest_start, time_of_interest_end)
 
 # Compute s_goal as before
-total_bikes = df_stations['s_init'].sum()
-total_capacity = df_stations['capacity'].sum()
-proportions = (df_stations['capacity'] / total_capacity) * total_bikes
-df_stations['s_goal_int'] = proportions.astype(int)
-df_stations['fraction'] = proportions - df_stations['s_goal_int']
-remaining_bikes = total_bikes - df_stations['s_goal_int'].sum()
-df_stations = df_stations.sort_values(by='fraction', ascending=False)
-df_stations.iloc[:remaining_bikes, df_stations.columns.get_loc('s_goal_int')] += 1
-df_stations['s_goal'] = df_stations['s_goal_int']
-df_stations = df_stations.drop(columns=['s_goal_int', 'fraction'])
+# total_bikes = df_stations['s_init'].sum()
+# total_capacity = df_stations['capacity'].sum()
+# proportions = (df_stations['capacity'] / total_capacity) * total_bikes
+# df_stations['s_goal_int'] = proportions.astype(int)
+# df_stations['fraction'] = proportions - df_stations['s_goal_int']
+# remaining_bikes = total_bikes - df_stations['s_goal_int'].sum()
+# df_stations = df_stations.sort_values(by='fraction', ascending=False)
+# df_stations.iloc[:remaining_bikes, df_stations.columns.get_loc('s_goal_int')] += 1
+# df_stations['s_goal'] = df_stations['s_goal_int']
+# df_stations = df_stations.drop(columns=['s_goal_int', 'fraction'])
 df_stations.reset_index(drop=True, inplace=True)
 
 
@@ -175,10 +194,52 @@ def predict_station_demand_naive(station_id, forecast_date=None):
     return predicted_values
 
 
-predicted_demands = {}
-for sno in df_stations['sno'].unique():
-    hourly_demands = predict_station_demand_naive(sno)
-    predicted_demands[sno] = hourly_demands
+def find_optimal_starting_point(hourly_demands, station_capacity):
+    """
+    Find the optimal starting inventory for a YouBike station given hourly demands.
+    
+    Args:
+        hourly_demands (list): Predicted hourly demand for the station.
+        station_capacity (int): Maximum capacity of the station.
+    
+    Returns:
+        dict: Optimal starting inventory and corresponding score.
+    """
+    best_s = None
+    best_score = float('inf')
+    
+    # Iterate over all possible starting inventory levels
+    for s in range(0, station_capacity + 1):
+        inventory = s
+        score = 0
+        
+        # Simulate the station's inventory over the day
+        for demand in hourly_demands:
+            inventory -= demand  # Apply demand
+            
+            # Calculate score for bound violations
+            if inventory < 0:  # Below lower bound (station empty)
+                score += abs(inventory)
+                inventory = 0  # Reset to lower bound
+            elif inventory > station_capacity:  # Above upper bound (station full)
+                score += (inventory - station_capacity)
+                inventory = station_capacity  # Reset to upper bound
+        
+        # Check if this starting point is better
+        if score < best_score:
+            best_score = score
+            best_s = s
+    
+    return {"best_starting_inventory": best_s, "score": best_score}
+
+
+def get_station_capacity(df, sno, default_capacity=10):
+    matching_rows = df.loc[df["sno"] == sno]
+    if not matching_rows.empty:
+        return int(matching_rows["capacity"].values[0])
+    else:
+        print(f"Warning: Station {sno} not found in df_stations. Using default capacity.")
+        return default_capacity
 
 depot = {
     "capacity": 0,
@@ -193,26 +254,41 @@ dists_from_depot = [geodesic(depot_coords, station).meters for station in statio
 dists_to_depot = dists_from_depot[:]
 
 num_stations = len(station_coords)
-distances = np.zeros((num_stations, num_stations))
-for i in range(num_stations):
-    for j in range(num_stations):
-        distances[i][j] = geodesic(station_coords[i], station_coords[j]).meters
+distance_csv_path = "distance_matrix_int.csv"
+df_distances = pd.read_csv(distance_csv_path, header=0)
+# stations = df_distances.columns.tolist()
+distance_matrix = df_distances.values.tolist()
 
+predicted_demands = {}
+for sno in df_distances.columns.to_list():
+    hourly_demands = predict_station_demand_naive(sno)
+    cap = get_station_capacity(df_stations, sno)
+    starting_point = find_optimal_starting_point(hourly_demands, cap)
+    predicted_demands[sno] = starting_point
+
+distances = []
 stations = []
-for idx, row in df_stations.iterrows():
-    sno = row['sno']
-    station = {
-        "id": idx,
-        "true_id": sno,
-        "station name": row['snaen'],
-        "capacity": row['capacity'],
-        "district": row['sareaen'],
-        "s_init": row['s_init'],
-        "s_goal": row['s_goal'],
-        "coords": [row['latitude'], row['longitude']],
-        "predicted_demand": predicted_demands[sno]
-    }
+for i, sno in enumerate(df_distances.columns):
+    row = df_stations.loc[df_stations["sno"] == sno]
+    if row.empty:
+        station = default_station
+        station['id'] = i
+        station['sno'] = sno
+    else:
+        station = {
+            "id": i,
+            "true_id": sno,
+            "station name": row['snaen'].values[0],
+            "capacity": int(row['capacity'].values[0]),
+            "district": row['sareaen'].values[0],
+            "s_init": int(row['s_init'].values[0]),
+            #"s_goal": row['s_goal'],
+            "coords": [row['latitude'].values[0], row['longitude'].values[0]],
+            "predicted_demand": predicted_demands[sno]
+        }
     stations.append(station)
+    distances.append(df_distances.iloc[:, i].to_list())
+
 
 instance = {
     "depot": {
@@ -224,14 +300,14 @@ instance = {
         "dists_to_depot": dists_to_depot
     },
     "stations": stations,
-    "distances": distances.tolist(),
+    "distances": distances,
     "vehicles": {
         "count": 2,
         "capacity": 20
     }
 }
 
-name = f"test_{time_of_interest}"
+name = f"test_{time_of_interest_start}_{time_of_interest_end}"
 output_file = f"{output_dir}/instance_forecast_{name}.json"
 with open(output_file, "w") as f:
     json.dump(instance, f, indent=4)
