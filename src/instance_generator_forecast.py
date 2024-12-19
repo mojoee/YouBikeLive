@@ -32,128 +32,97 @@ default_station = {
 
 def fetch_stations(start_time, end_time):
     """
-    Fetch and group station data over a specified time period.
+    Fetch station data from the database.
 
     Args:
         start_time (str): Start time in '%H:%M' format.
         end_time (str): End time in '%H:%M' format.
 
     Returns:
-        pd.DataFrame: Grouped and aggregated station data.
+        pd.DataFrame: Aggregated station data.
     """
     conn = sqlite3.connect(db_path)
-    
+
     query = f"""
     SELECT 
-        sno, 
-        snaen, 
-        sareaen, 
-        latitude,
-        longitude, 
-        total AS capacity, 
-        AVG(available_rent_bikes) AS avg_s_init, 
-        MAX(mday) AS last_update_time
-    FROM youbike_data
-    WHERE strftime('%H:%M', mday) BETWEEN '{start_time}' AND '{end_time}'
-    GROUP BY sno, snaen, sareaen, latitude, longitude, capacity
-    ORDER BY sno;
+        youbike_stations.sno, 
+        youbike_stations.snaen, 
+        youbike_stations.sareaen, 
+        youbike_stations.latitude, 
+        youbike_stations.longitude, 
+        youbike_stations.capacity, 
+        AVG(youbike_status.available_rent_bikes) AS s_init
+    FROM youbike_stations
+    JOIN youbike_status ON youbike_stations.sno = youbike_status.sno
+    WHERE strftime('%H:%M', youbike_status.mday) BETWEEN '{start_time}' AND '{end_time}'
+    GROUP BY youbike_stations.sno, youbike_stations.snaen, youbike_stations.sareaen, youbike_stations.latitude, youbike_stations.longitude, youbike_stations.capacity
+    ORDER BY youbike_stations.sno;
     """
+    
     df = pd.read_sql_query(query, conn)
     conn.close()
-    
-    # Rename aggregated columns for clarity
-    df.rename(columns={"avg_s_init": "s_init"}, inplace=True)
-    
+
+    df.rename(columns={"s_init": "s_init"}, inplace=True)
     return df
 
+# Fetch stations data
 df_stations = fetch_stations(time_of_interest_start, time_of_interest_end)
-
-# Compute s_goal as before
-# total_bikes = df_stations['s_init'].sum()
-# total_capacity = df_stations['capacity'].sum()
-# proportions = (df_stations['capacity'] / total_capacity) * total_bikes
-# df_stations['s_goal_int'] = proportions.astype(int)
-# df_stations['fraction'] = proportions - df_stations['s_goal_int']
-# remaining_bikes = total_bikes - df_stations['s_goal_int'].sum()
-# df_stations = df_stations.sort_values(by='fraction', ascending=False)
-# df_stations.iloc[:remaining_bikes, df_stations.columns.get_loc('s_goal_int')] += 1
-# df_stations['s_goal'] = df_stations['s_goal_int']
-# df_stations = df_stations.drop(columns=['s_goal_int', 'fraction'])
-df_stations.reset_index(drop=True, inplace=True)
-
 
 def load_and_preprocess_station(station_id):
     conn = sqlite3.connect(db_path)
     query = f"""
     SELECT *
-    FROM youbike_data
+    FROM youbike_status
     WHERE sno = '{station_id}'
     ORDER BY mday ASC;
     """
     df = pd.read_sql_query(query, conn)
     conn.close()
 
-    df['srcUpdateTime'] = pd.to_datetime(df['srcUpdateTime'])
-    df = df.sort_values('srcUpdateTime').set_index('srcUpdateTime')
-    df = df.dropna(subset=['available_rent_bikes'])
+    # Ensure `mday` is in datetime format for resampling
+    df['mday'] = pd.to_datetime(df['mday'])
+    df = df.set_index('mday')
 
-    # Drop non-numeric columns if they still exist after previous steps
+    # Drop non-numeric columns
     non_numeric_cols = df.select_dtypes(exclude=[np.number]).columns
     df = df.drop(columns=non_numeric_cols, errors='ignore')
 
-    # Now select numeric columns only for the resample and mean operation
-    numeric_cols = df.select_dtypes(include=[np.number]).columns
-    df = df[numeric_cols].resample('1h').mean().ffill()
-    # Compute demand:
-    # Normally: demand(t) = available_bikes(t-1) - available_bikes(t)
-    # But we adjust if station is empty or full.
+    # Resample and fill missing values
+    df = df.resample('1h').mean().ffill()
+
+    # Ensure `capacity` is present
     if 'capacity' not in df.columns:
-        # If capacity isn't present in the data, we need it.
-        # Ideally, capacity is known from df_stations. Let's just merge it.
-        # We'll assume we can load capacity from df_stations.
-        # If multiple stations share the same ID, we need a lookup.
-        # For simplicity, just fetch from df_stations once.
         global df_stations
         cap = df_stations.loc[df_stations['sno'] == station_id, 'capacity']
         if len(cap) > 0:
             capacity = cap.iloc[0]
         else:
-            capacity = df['available_rent_bikes'].max()  # fallback guess
+            capacity = df['available_rent_bikes'].max()  # Fallback guess
         df['capacity'] = capacity
     else:
-        capacity = df['capacity'].mean()  # assuming stable capacity
+        capacity = df['capacity'].mean()
 
-    # We'll compute demand hour by hour
+    # Compute demand
     demands = []
     prev_bikes = None
-    prev_demand = 0  # Store previous hour's demand to handle consecutive empties/full stations
+    prev_demand = 0
     for t in df.index:
         curr_bikes = df.at[t, 'available_rent_bikes']
         if prev_bikes is None:
-            # First hour no demand calculation possible
             demand = 0
         else:
             raw_demand = prev_bikes - curr_bikes
-            # Check station status
             if curr_bikes == 0:
-                # Station empty. If we see a drop from prev_bikes to 0, set demand = prev_bikes
-                # If it stays empty (prev_bikes=0 too), assume same as previous hour's demand to indicate unserved demand
                 if prev_bikes > 0:
                     demand = prev_bikes
                 else:
-                    # consecutive empty hours, assume same unserved demand as previous hour
-                    demand = prev_demand if prev_demand > 0 else 1  # at least 1 bike demanded
+                    demand = prev_demand if prev_demand > 0 else 1
             elif curr_bikes == capacity:
-                # Station full. If we see an increase to full, negative demand = returns.
-                # If previously less, demand = prev_bikes - capacity (typically negative).
-                # If consecutive full, assume same negative demand pattern continues.
                 if prev_bikes < capacity:
                     demand = prev_bikes - capacity
                 else:
-                    # consecutive full hours, assume same negative demand as previous hour
                     demand = prev_demand if prev_demand < 0 else -1
             else:
-                # Normal case: just use raw_demand
                 demand = raw_demand
 
         demands.append(demand)
@@ -167,13 +136,12 @@ def load_and_preprocess_station(station_id):
 def predict_station_demand_naive(station_id, forecast_date=None):
     df = load_and_preprocess_station(station_id)
     if df.empty:
-        return [0]*24
+        return [0] * 24
 
     if forecast_date is None:
         last_date = df.index[-1].date()
         forecast_date = (pd.to_datetime(last_date) + pd.Timedelta(days=1)).date()
 
-    # demand(t) = (demand(t-1day) + demand(t-1week))/2
     forecast_start = pd.to_datetime(forecast_date)
     forecast_end = forecast_start + pd.Timedelta(hours=23)
     hours = pd.date_range(start=forecast_start, end=forecast_end, freq='1H')
@@ -193,45 +161,28 @@ def predict_station_demand_naive(station_id, forecast_date=None):
 
     return predicted_values
 
-
 def find_optimal_starting_point(hourly_demands, station_capacity):
-    """
-    Find the optimal starting inventory for a YouBike station given hourly demands.
-    
-    Args:
-        hourly_demands (list): Predicted hourly demand for the station.
-        station_capacity (int): Maximum capacity of the station.
-    
-    Returns:
-        dict: Optimal starting inventory and corresponding score.
-    """
     best_s = None
     best_score = float('inf')
-    
-    # Iterate over all possible starting inventory levels
+
     for s in range(0, station_capacity + 1):
         inventory = s
         score = 0
-        
-        # Simulate the station's inventory over the day
+
         for demand in hourly_demands:
-            inventory -= demand  # Apply demand
-            
-            # Calculate score for bound violations
-            if inventory < 0:  # Below lower bound (station empty)
+            inventory -= demand
+            if inventory < 0:
                 score += abs(inventory)
-                inventory = 0  # Reset to lower bound
-            elif inventory > station_capacity:  # Above upper bound (station full)
+                inventory = 0
+            elif inventory > station_capacity:
                 score += (inventory - station_capacity)
-                inventory = station_capacity  # Reset to upper bound
-        
-        # Check if this starting point is better
+                inventory = station_capacity
+
         if score < best_score:
             best_score = score
             best_s = s
-    
-    return {"best_starting_inventory": best_s, "score": best_score}
 
+    return {"best_starting_inventory": best_s, "score": best_score}
 
 def get_station_capacity(df, sno, default_capacity=10):
     matching_rows = df.loc[df["sno"] == sno]
@@ -241,66 +192,62 @@ def get_station_capacity(df, sno, default_capacity=10):
         print(f"Warning: Station {sno} not found in df_stations. Using default capacity.")
         return default_capacity
 
-depot = {
-    "capacity": 0,
-    "s_init": 0,
-    "s_goal": 0,
-    "coords": [25.02000, 121.53300]
-}
-
-station_coords = df_stations[['latitude', 'longitude']].values
-depot_coords = np.array(depot['coords'])
-dists_from_depot = [geodesic(depot_coords, station).meters for station in station_coords]
-dists_to_depot = dists_from_depot[:]
-
-num_stations = len(station_coords)
-distance_csv_path = "distance_matrix_int.csv"
-df_distances = pd.read_csv(distance_csv_path, header=0)
-# stations = df_distances.columns.tolist()
-distance_matrix = df_distances.values.tolist()
-
+# Compute demands and balance s_init and s_goal
 predicted_demands = {}
-for sno in df_distances.columns.to_list():
+for sno in df_stations['sno']:
     hourly_demands = predict_station_demand_naive(sno)
     cap = get_station_capacity(df_stations, sno)
     starting_point = find_optimal_starting_point(hourly_demands, cap)
     predicted_demands[sno] = starting_point
 
-distances = []
-stations = []
-for i, sno in enumerate(df_distances.columns):
-    row = df_stations.loc[df_stations["sno"] == sno]
-    if row.empty:
-        station = default_station
-        station['id'] = i
-        station['sno'] = sno
-    else:
-        station = {
-            "id": i,
-            "true_id": sno,
-            "station name": row['snaen'].values[0],
-            "capacity": int(row['capacity'].values[0]),
-            "district": row['sareaen'].values[0],
-            "s_init": int(row['s_init'].values[0]),
-            #"s_goal": row['s_goal'],
-            "coords": [row['latitude'].values[0], row['longitude'].values[0]],
-            "predicted_demand": predicted_demands[sno]
-        }
-    stations.append(station)
-    distances.append(df_distances.iloc[:, i].to_list())
+total_s_init = df_stations['s_init'].sum()
+total_s_goal = sum(predicted_demands[sno]['best_starting_inventory'] for sno in df_stations['sno'])
 
+if total_s_goal != total_s_init:
+    discrepancy = total_s_init - total_s_goal
+    print(f"Balancing discrepancy: {discrepancy}")
+
+    for sno in df_stations['sno']:
+        if discrepancy == 0:
+            break
+        adjustment = np.sign(discrepancy)
+        predicted_demands[sno]['best_starting_inventory'] += adjustment
+        discrepancy -= adjustment
+
+# Generate instance data
+stations = []
+for i, sno in enumerate(df_stations['sno']):
+    row = df_stations[df_stations['sno'] == sno]
+    station = {
+        "id": i,
+        "true_id": sno,
+        "station_name": row['snaen'].values[0],
+        "capacity": int(row['capacity'].values[0]),
+        "district": row['sareaen'].values[0],
+        "s_init": int(row['s_init'].values[0]),
+        "s_goal": int(predicted_demands[sno]['best_starting_inventory']),
+        "coords": [row['latitude'].values[0], row['longitude'].values[0]],
+        "predicted_demand": predicted_demands[sno]
+    }
+    stations.append(station)
+
+distance_csv_path = "distance_matrix_int.csv"
+df_distances = pd.read_csv(distance_csv_path, header=0)
+# stations = df_distances.columns.tolist()
+distance_matrix = df_distances.values.tolist()
+df_distances.index = df_distances.columns
+
+distance_matrix = []
+for i, sno in enumerate(df_stations['sno']):
+    surr = []
+    for j, sno_2 in enumerate(df_stations['sno']):
+        distance = int(df_distances[sno][sno_2])
+        surr.append(distance)
+    distance_matrix.append(surr)
 
 instance = {
-    "depot": {
-        "capacity": depot['capacity'],
-        "s_init": depot['s_init'],
-        "s_goal": depot['s_goal'],
-        "coords": depot['coords'],
-        "dists_from_depot": dists_from_depot,
-        "dists_to_depot": dists_to_depot
-    },
     "stations": stations,
-    "distances": distances,
+    "distances": distance_matrix,
     "vehicles": {
         "count": 2,
         "capacity": 20
