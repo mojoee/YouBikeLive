@@ -3,100 +3,101 @@ import sqlite3
 from datetime import datetime
 import schedule
 import time
-
+import logging
 
 # JSON endpoint
 URL = 'https://tcgbusfs.blob.core.windows.net/dotapp/youbike/v2/youbike_immediate.json'
 
+# Logging configuration
+logging.basicConfig(level=logging.INFO, filename='data_collector.log', 
+                    format='%(asctime)s - %(levelname)s - %(message)s')
 
-# Connect to the SQLite database (or create it)
+# Connect to the SQLite database (or create it)SELECT 
 conn = sqlite3.connect('youbike_data.db')
 cursor = conn.cursor()
 
-'''
-
-Sample Observation
-{
-    "sno": "500101001",
-    "sna": "YouBike2.0_捷運科技大樓站",
-    "sarea": "大安區",
-    "mday": "2024-11-25 12:02:15",
-    "ar": "復興南路二段235號前",
-    "sareaen": "Daan Dist.",
-    "snaen": "YouBike2.0_MRT Technology Bldg. Sta.",
-    "aren": "No.235， Sec. 2， Fuxing S. Rd.",
-    "act": "1",
-    "srcUpdateTime": "2024-11-25 12:02:24",
-    "updateTime": "2024-11-25 12:02:52",
-    "infoTime": "2024-11-25 12:02:15",
-    "infoDate": "2024-11-25",
-    "total": 28,
-    "available_rent_bikes": 1,
-    "latitude": 25.02605,
-    "longitude": 121.5436,
-    "available_return_bikes": 26
-  }
-
-'''
-# Create table if it doesn't exist
+# Create tables
 cursor.execute('''
-    CREATE TABLE IF NOT EXISTS youbike_data (
-        sno TEXT,
+    CREATE TABLE IF NOT EXISTS youbike_stations (
+        sno TEXT PRIMARY KEY,
         sna TEXT,
         sarea TEXT,
-        mday TEXT,
         ar TEXT,
         sareaen TEXT,
         snaen TEXT,
         aren TEXT,
-        act INTEGER,
-        srcUpdateTime TEXT,
-        updateTime TEXT,
-        infoTime TEXT,
-        infoDate TEXT,
-        total INTEGER,
-        available_rent_bikes INTEGER,
         latitude REAL,
         longitude REAL,
+        capacity INTEGER
+    )
+''')
+cursor.execute('''
+    CREATE TABLE IF NOT EXISTS youbike_status (
+        sno TEXT,
+        mday TEXT,
+        available_rent_bikes INTEGER,
         available_return_bikes INTEGER,
-        PRIMARY KEY (sno, mday) -- Prevent duplicate entries based on unique station and time
+        PRIMARY KEY (sno, mday),
+        FOREIGN KEY (sno) REFERENCES youbike_stations(sno)
     )
 ''')
 conn.commit()
 
-# Function to fetch and store JSON data
 def fetch_and_store():
     try:
-        response = requests.get(URL)  # Replace with the actual endpoint
+        response = requests.get(URL)
         response.raise_for_status()
         data = response.json()
 
         for record in data:
-            # Insert each record into the database
+            # Extract station information
+            station_info = (
+                record["sno"], record["sna"], record["sarea"], record["ar"],
+                record["sareaen"], record["snaen"], record["aren"],
+                float(record["latitude"]), float(record["longitude"]), int(record["total"])
+            )
+
+            # Insert station information
             cursor.execute('''
-                INSERT OR IGNORE INTO youbike_data (
-                    sno, sna, sarea, mday, ar, sareaen, snaen, aren, act,
-                    srcUpdateTime, updateTime, infoTime, infoDate, total,
-                    available_rent_bikes, latitude, longitude, available_return_bikes
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            ''', (
-                record["sno"], record["sna"], record["sarea"], record["mday"], record["ar"],
-                record["sareaen"], record["snaen"], record["aren"], int(record["act"]),
-                record["srcUpdateTime"], record["updateTime"], record["infoTime"], record["infoDate"],
-                int(record["total"]), int(record["available_rent_bikes"]),
-                float(record["latitude"]), float(record["longitude"]), int(record["available_return_bikes"])
-            ))
+                INSERT OR IGNORE INTO youbike_stations (
+                    sno, sna, sarea, ar, sareaen, snaen, aren, latitude, longitude, capacity
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ''', station_info)
+
+            # Extract status information
+            status_info = (
+                record["sno"], record["mday"],
+                int(record.get("available_rent_bikes", 0)),
+                int(record.get("available_return_bikes", 0))
+            )
+
+            # Insert status information
+            cursor.execute('''
+                INSERT OR IGNORE INTO youbike_status (
+                    sno, mday, available_rent_bikes, available_return_bikes
+                ) VALUES (?, ?, ?, ?)
+            ''', status_info)
 
         conn.commit()
-        print("Data stored successfully.")
+        logging.info("Data stored successfully.")
 
     except requests.RequestException as e:
-        print(f"Error fetching data: {e}")
+        logging.error(f"Error fetching data: {e}")
+    except sqlite3.Error as e:
+        logging.error(f"Database error: {e}")
+    except Exception as e:
+        logging.error(f"Unexpected error: {e}")
 
-# Schedule the function to run every minute
-schedule.every(1).minutes.do(fetch_and_store)
-
-# Run the scheduler
+# Retry mechanism
 while True:
-    schedule.run_pending()
-    time.sleep(1)
+    try:
+        schedule.every(1).minutes.do(fetch_and_store)
+
+        # Run the scheduler
+        while True:
+            schedule.run_pending()
+            time.sleep(1)
+
+    except Exception as e:
+        logging.error(f"Script crashed with error: {e}. Restarting...")
+        time.sleep(5)

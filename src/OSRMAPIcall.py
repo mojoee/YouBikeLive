@@ -20,7 +20,7 @@ def get_coordinates_from_db():
     """
     with sqlite3.connect(DB_PATH) as conn:
         cursor = conn.cursor()
-        cursor.execute("SELECT sno, snaen, longitude, latitude FROM youbike_data")
+        cursor.execute("SELECT sno, snaen, longitude, latitude FROM youbike_stations ORDER BY youbike_stations.sno;")
         coordinates = cursor.fetchall()  # Returns a list of tuples [(lon, lat), ...]
 
     unique_coordinates = list(set(coordinates))
