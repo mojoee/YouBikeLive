@@ -1,0 +1,278 @@
+{
+    "instance": "./data/instances_v4/forecast_test_12_30_18_30.json",
+    "time_limit": 360,
+    "running_time": 360,
+    "status": "FEASIBLE",
+    "objectives": [
+        {
+            "name": "total_reward",
+            "value": 76,
+            "bound": 19344,
+            "gap": 0.9960711331679074
+        },
+        {
+            "name": "max_duration",
+            "value": 1725,
+            "bound": 0,
+            "gap": 1.0
+        }
+    ],
+    "routes": [
+        {
+            "reward": 6,
+            "duration": 1719,
+            "route": [
+                3,
+                5,
+                11,
+                0,
+                1,
+                16
+            ],
+            "leaving_load": [
+                1,
+                2,
+                3,
+                2,
+                3,
+                2
+            ]
+        },
+        {
+            "reward": 6,
+            "duration": 1725,
+            "route": [
+                207,
+                229,
+                245,
+                226,
+                223,
+                251
+            ],
+            "leaving_load": [
+                1,
+                2,
+                3,
+                2,
+                3,
+                4
+            ]
+        },
+        {
+            "reward": 5,
+            "duration": 1715,
+            "route": [
+                277,
+                336,
+                285,
+                275,
+                339
+            ],
+            "leaving_load": [
+                1,
+                0,
+                1,
+                2,
+                3
+            ]
+        },
+        {
+            "reward": 5,
+            "duration": 1705,
+            "route": [
+                433,
+                449,
+                420,
+                450,
+                413
+            ],
+            "leaving_load": [
+                1,
+                2,
+                1,
+                0,
+                1
+            ]
+        },
+        {
+            "reward": 6,
+            "duration": 1725,
+            "route": [
+                579,
+                521,
+                575,
+                548,
+                518,
+                560
+            ],
+            "leaving_load": [
+                1,
+                2,
+                3,
+                2,
+                1,
+                0
+            ]
+        },
+        {
+            "reward": 6,
+            "duration": 1724,
+            "route": [
+                719,
+                702,
+                747,
+                699,
+                764,
+                700
+            ],
+            "leaving_load": [
+                1,
+                0,
+                1,
+                2,
+                1,
+                0
+            ]
+        },
+        {
+            "reward": 6,
+            "duration": 1713,
+            "route": [
+                933,
+                801,
+                802,
+                805,
+                804,
+                903
+            ],
+            "leaving_load": [
+                1,
+                2,
+                1,
+                2,
+                1,
+                2
+            ]
+        },
+        {
+            "reward": 6,
+            "duration": 1694,
+            "route": [
+                1037,
+                1045,
+                1038,
+                983,
+                956,
+                995
+            ],
+            "leaving_load": [
+                1,
+                2,
+                1,
+                2,
+                1,
+                2
+            ]
+        },
+        {
+            "reward": 6,
+            "duration": 1712,
+            "route": [
+                1087,
+                1099,
+                1110,
+                1089,
+                1123,
+                1070
+            ],
+            "leaving_load": [
+                1,
+                2,
+                1,
+                2,
+                3,
+                2
+            ]
+        },
+        {
+            "reward": 6,
+            "duration": 1684,
+            "route": [
+                1209,
+                1166,
+                1217,
+                1177,
+                1167,
+                1168
+            ],
+            "leaving_load": [
+                1,
+                0,
+                1,
+                2,
+                3,
+                2
+            ]
+        },
+        {
+            "reward": 6,
+            "duration": 1689,
+            "route": [
+                1269,
+                1268,
+                1293,
+                1349,
+                1303,
+                1270
+            ],
+            "leaving_load": [
+                1,
+                0,
+                1,
+                2,
+                3,
+                2
+            ]
+        },
+        {
+            "reward": 6,
+            "duration": 1717,
+            "route": [
+                1413,
+                1391,
+                1414,
+                1389,
+                1388,
+                1386
+            ],
+            "leaving_load": [
+                1,
+                2,
+                1,
+                2,
+                1,
+                0
+            ]
+        },
+        {
+            "reward": 6,
+            "duration": 1720,
+            "route": [
+                1439,
+                1477,
+                1461,
+                1441,
+                1444,
+                1476
+            ],
+            "leaving_load": [
+                1,
+                2,
+                3,
+                4,
+                3,
+                2
+            ]
+        }
+    ]
+}
