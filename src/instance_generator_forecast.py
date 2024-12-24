@@ -72,7 +72,7 @@ def load_and_preprocess_station(station_id):
     conn = sqlite3.connect(db_path)
     query = f"""
     SELECT *
-    FROM youbike_status
+    FROM youbike_data
     WHERE sno = '{station_id}'
     ORDER BY mday ASC;
     """
@@ -143,7 +143,7 @@ def predict_station_demand_naive(station_id, forecast_date=None):
         forecast_date = (pd.to_datetime(last_date) + pd.Timedelta(days=1)).date()
 
     forecast_start = pd.to_datetime(forecast_date)
-    forecast_end = forecast_start + pd.Timedelta(hours=23)
+    forecast_end = forecast_start + pd.Timedelta(days=7, hours=23)
     hours = pd.date_range(start=forecast_start, end=forecast_end, freq='1H')
 
     predicted_values = []
@@ -231,7 +231,7 @@ for i, sno in enumerate(df_stations['sno']):
     }
     stations.append(station)
 
-distance_csv_path = "distance_matrix_int.csv"
+distance_csv_path = "distance_matrix.csv"
 df_distances = pd.read_csv(distance_csv_path, header=0)
 # stations = df_distances.columns.tolist()
 distance_matrix = df_distances.values.tolist()
