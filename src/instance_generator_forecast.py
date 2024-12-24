@@ -5,6 +5,7 @@ from geopy.distance import geodesic
 import json
 import os
 import matplotlib.pyplot as plt
+from utils import fetch_stations
 
 from config import cfg
 
@@ -30,43 +31,9 @@ default_station = {
     "predicted_demand": [0] * 24  # 24 hours of zero demand
 }
 
-def fetch_stations(start_time, end_time):
-    """
-    Fetch station data from the database.
-
-    Args:
-        start_time (str): Start time in '%H:%M' format.
-        end_time (str): End time in '%H:%M' format.
-
-    Returns:
-        pd.DataFrame: Aggregated station data.
-    """
-    conn = sqlite3.connect(db_path)
-
-    query = f"""
-    SELECT 
-        youbike_stations.sno, 
-        youbike_stations.snaen, 
-        youbike_stations.sareaen, 
-        youbike_stations.latitude, 
-        youbike_stations.longitude, 
-        youbike_stations.capacity, 
-        AVG(youbike_status.available_rent_bikes) AS s_init
-    FROM youbike_stations
-    JOIN youbike_status ON youbike_stations.sno = youbike_status.sno
-    WHERE strftime('%H:%M', youbike_status.mday) BETWEEN '{start_time}' AND '{end_time}'
-    GROUP BY youbike_stations.sno, youbike_stations.snaen, youbike_stations.sareaen, youbike_stations.latitude, youbike_stations.longitude, youbike_stations.capacity
-    ORDER BY youbike_stations.sno;
-    """
-    
-    df = pd.read_sql_query(query, conn)
-    conn.close()
-
-    df.rename(columns={"s_init": "s_init"}, inplace=True)
-    return df
 
 # Fetch stations data
-df_stations = fetch_stations(time_of_interest_start, time_of_interest_end)
+df_stations = fetch_stations(time_of_interest_start, time_of_interest_end, db_path)
 
 def load_and_preprocess_station(station_id):
     conn = sqlite3.connect(db_path)
