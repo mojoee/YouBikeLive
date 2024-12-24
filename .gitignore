@@ -9,4 +9,5 @@ results/optimization
 202302_YouBike_Rental.csv
 *.db
 *.log
+*.pyc
 
