@@ -50,8 +50,9 @@ def rebalance_v4(instance_path, solution_path, time_limit):
     print("Solving", instance_path)
     print("stations_cnt:", stations_cnt)
     print("demand_min:", min(demands_data))
-    print("demand_max", max(demands_data))
-    print("demands", demands_data)
+    print("demand_max:", max(demands_data))
+    print("abs_demands_total:", sum([abs(d) for d in demands_data]))
+    # print("demands", demands_data)
     print("vehicles_cnt:", vehicles_cnt)
     print("vehicles_capacities:", vehicles_capacities)
     print("vehicles_depots", vehicles_depots)
@@ -161,9 +162,9 @@ def rebalance_v4(instance_path, solution_path, time_limit):
 
 if __name__ == "__main__":
     # DEFAULT PARAMETERS
-    instance_path = "./data/instances_v4/n10_v4_d2.json"
+    instance_path = "./data/instances_v4/demo_12_24_24.json"
     solution_dir = "./results/v4/"
-    time_limit = 30
+    time_limit = 300
 
     name = instance_path.split('/')[-1]
     solution_path = solution_dir + name

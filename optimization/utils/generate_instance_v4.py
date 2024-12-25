@@ -5,7 +5,7 @@ import numpy as np
 import math
 
 base_instance_path = "./data/instances_v4/forecast_test_12_30_18_30_base.json"
-output_path = "./data/instances_v4/forecast_test_12_30_18_30.json"
+output_path = "./data/instances_v4/demo_12_24_24.json"
 
 
 instance = {}
@@ -34,8 +34,8 @@ print("stations_cnt:" , stations_cnt)
 # TODO temporary fill in: c_reward = 1, demand = +-1
 for station in stations:
     station["c_reward"] = 1
-    station["s_init"] = station["id"] % 2
-    station["s_goal"] = (station["id"] + 1) % 2
+    station["s_init"] = (station["id"] % 2) * 12
+    station["s_goal"] = ((station["id"] + 1) % 2) * 12
 
 s_init_sum = sum([station["s_init"] for station in stations])
 s_goal_sum = sum([station["s_goal"] for station in stations])
@@ -84,14 +84,17 @@ for i in range(districts_cnt):
 
 # ADD VEHICLES
 vehicles = []
-capacity = 24
-for i in range(districts_cnt):
-    vehicle = {
-        "id": i,
-        "depot_id": i, 
-        "capacity": capacity
-    }
-    vehicles.append(vehicle)
+capacities = [12, 24, 24] # per district
+vehicle_id = 0
+for district_id in range(districts_cnt):
+    for capacity in capacities:
+        vehicle = {
+            "id": vehicle_id,
+            "depot_id": district_id, 
+            "capacity": capacity
+        }
+        vehicles.append(vehicle)
+        vehicle_id += 1
 
 # CONSTANTS
 constants = { # in seconds
@@ -109,10 +112,8 @@ data = {
     "constants": constants
 }
 
-
 data_string = json.dumps(data, indent=4)
 # print(data_string)
-
 
 with open(output_path, "w") as outfile:
     outfile.write(data_string)
