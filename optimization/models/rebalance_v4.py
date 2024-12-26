@@ -162,7 +162,7 @@ def rebalance_v4(instance_path, solution_path, time_limit):
 
 if __name__ == "__main__":
     # DEFAULT PARAMETERS
-    instance_path = "./data/instances_v4/demo_12_24_24.json"
+    instance_path = "./data/instances_v4/v12-24-24_b8h_d12.json"
     solution_dir = "./results/v4/"
     time_limit = 300
 
