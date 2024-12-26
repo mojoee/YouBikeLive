@@ -153,7 +153,13 @@ def rebalance_v4(instance_path, solution_path, time_limit):
         for k in range(vehicles_cnt):
             route = [station for station in routes[k].value]
             leaving_load = [load for load in loads[k].value]
-            result["routes"].append({"reward": routes_rewards[k].value, "duration": routes_costs[k].value, "route": route, "leaving_load": leaving_load})        
+            result["routes"].append({
+                                    "id": k,
+                                    "depot_id": vehicles_depots[k],
+                                    "reward": routes_rewards[k].value, 
+                                     "duration": routes_costs[k].value, 
+                                     "route": route,
+                                     "leaving_load": leaving_load})        
         result_string = json.dumps(result, indent=4)
 
         with open(solution_path, "w") as outfile:
@@ -167,7 +173,7 @@ if __name__ == "__main__":
     # DEFAULT PARAMETERS
     instance_path = "./data/instances_v4/v12-24_b2h_d12.json"
     solution_dir = "./results/v4/"
-    time_limit = 120
+    time_limit = 60
 
     name = instance_path.split('/')[-1]
     solution_path = solution_dir + name
