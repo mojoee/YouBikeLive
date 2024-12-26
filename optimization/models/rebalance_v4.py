@@ -100,6 +100,9 @@ def rebalance_v4(instance_path, solution_path, time_limit):
             min_quantity_lambda = model.lambda_function(lambda i: loads[k][i] >= 0)
             model.constraint(model.and_(model.range(0, c), min_quantity_lambda))
 
+            # Return with empty vehicle
+            model.constraint(loads[k][c - 1] == 0)
+
             # Distance traveled by each vehicle
             dist_lambda = model.lambda_function(lambda i: model.at(dist_matrix, route[i - 1], route[i]))
             depot_id = vehicles_depots[k]
@@ -162,9 +165,9 @@ def rebalance_v4(instance_path, solution_path, time_limit):
 
 if __name__ == "__main__":
     # DEFAULT PARAMETERS
-    instance_path = "./data/instances_v4/v12-24-24_b8h_d12.json"
+    instance_path = "./data/instances_v4/v12-24_b2h_d12.json"
     solution_dir = "./results/v4/"
-    time_limit = 300
+    time_limit = 120
 
     name = instance_path.split('/')[-1]
     solution_path = solution_dir + name
