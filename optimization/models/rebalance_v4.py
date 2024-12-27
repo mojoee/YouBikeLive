@@ -8,7 +8,7 @@ import os
 
 
 
-def rebalance_v4(instance_path, solution_path, time_limit):
+def rebalance_v4(instance_path, solution_path, time_limit, routes_init=None):
     """
     1) Maximize cumulative reward for rebalancing.
     Limited trip duration = travel time + loading time * parking time.
@@ -62,7 +62,7 @@ def rebalance_v4(instance_path, solution_path, time_limit):
     print("max_trip_duration:", max_trip_duration)
     print()
 
-        # MODEL
+    # MODEL
     with hexaly.optimizer.HexalyOptimizer() as optimizer:
         model = optimizer.model
 
@@ -100,7 +100,7 @@ def rebalance_v4(instance_path, solution_path, time_limit):
             min_quantity_lambda = model.lambda_function(lambda i: loads[k][i] >= 0)
             model.constraint(model.and_(model.range(0, c), min_quantity_lambda))
 
-            # Return with empty vehicle
+            # Return with empty vehicle # TODO this does not work as intended
             # model.constraint(loads[k][c - 1] == 0)
             # model.constraint(model.at(loads[k], c - 1) == 0)
             # demand_lambda = model.lambda_function(lambda i: model.at(demands, route[i]))
@@ -127,6 +127,7 @@ def rebalance_v4(instance_path, solution_path, time_limit):
             # Contraint on total trip duration
             model.constraint(routes_costs[k] <= max_trip_duration)
 
+        
         # OBJECTIVES
         # 1) Maximize cumulative reward
         total_reward = model.sum(routes_rewards)
@@ -136,6 +137,19 @@ def rebalance_v4(instance_path, solution_path, time_limit):
         model.minimize(max_duration)
 
         model.close()
+
+        # SET INITIAL SOLUTION
+        if routes_init is not None:
+            print("Setting initial solution")
+            assert len(routes) == len(routes_init)
+            for i in range(len(routes)):
+                route = routes[i]
+                route_val = route.get_value()
+                route_val.clear()
+                route_init = routes_init[i]
+                for st in route_init:
+                    route_val.add(st)
+                # print(route_val)
 
         # SOLVE
         optimizer.param.time_limit = time_limit
