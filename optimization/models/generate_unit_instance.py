@@ -294,7 +294,7 @@ def generate_unit_instance_v4(instance_path, output_path):
     print("data_new prepared")
 
     with open(output_path, "w") as outfile:
-        json.dump(data_new, outfile, indent=4)
+        json.dump(data_new, outfile, indent=None)
         print("Exported instance", output_path)
 
     return
