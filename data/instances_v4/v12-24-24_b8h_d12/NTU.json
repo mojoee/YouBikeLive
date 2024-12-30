@@ -138,7 +138,7 @@
             "capacity": 37,
             "district": "NTU Dist",
             "s_init": 0,
-            "s_goal": 12,
+            "s_goal": 25,
             "coords": [
                 25.01493,
                 121.53044
@@ -155,7 +155,7 @@
             "station_name": "YouBike2.0_NTU Complex for Research Excellence",
             "capacity": 92,
             "district": "NTU Dist",
-            "s_init": 12,
+            "s_init": 25,
             "s_goal": 0,
             "coords": [
                 25.01466,
