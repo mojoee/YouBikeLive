@@ -28,10 +28,10 @@ class Tee:
             f.flush()
 
 
-instance = "./data/instances_v4/v12-24-24_b8h_d12.json"
-solution_dir = "./results/ws_v4/"
-time_limit_init = 30*60
-time_limit_unit = 30*60
+instance = "./data/instances_v4/v12-24-24_b8h_d12/NTU.json"
+solution_dir = "./results/ws_v4/v12-24-24_b8h_d12/"
+time_limit_init = 30
+time_limit_unit = 30
 
 os.makedirs(solution_dir, exist_ok=True)
 problem_name = instance.split("/")[-1].replace(".json", "")
@@ -91,7 +91,7 @@ else:
     rebalance_v4(instance_unit, solution_unit, time_limit_unit, routes_init)
 
 # Process unit solution
-process_unit_solution(instance_unit, solution_unit)
+process_unit_solution(instance_unit, solution_unit, "_unit.json")
 
 # Create final solution visualization
 solution_path = solution_dir + problem_name + ".json"

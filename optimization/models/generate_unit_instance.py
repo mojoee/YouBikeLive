@@ -326,7 +326,7 @@ def generate_cb_instance(instance_path, output_path):
             continue
         demand_new = np.sign(demand)
         for i in range(abs(demand) // min_capacity):
-            station_new = {"id": stCnt_new, "parent_id": station["id"], "c_reward": station["c_reward"]}
+            station_new = {"id": stCnt_new, "parent_id": station["id"], "c_reward": station["c_reward"], "coords": station["coords"]}
             stCnt_new += 1
             if demand_new > 0:
                 station_new["s_init"] = 0
@@ -337,7 +337,7 @@ def generate_cb_instance(instance_path, output_path):
             stations_new.append(station_new)
         remaining_demand = abs(demand) % min_capacity
         if remaining_demand > 0:
-            station_new = {"id": stCnt_new, "parent_id": station["id"], "c_reward": station["c_reward"]}
+            station_new = {"id": stCnt_new, "parent_id": station["id"], "c_reward": station["c_reward"], "coords": station["coords"]}
             stCnt_new += 1
             if demand_new > 0:
                 station_new["s_init"] = 0

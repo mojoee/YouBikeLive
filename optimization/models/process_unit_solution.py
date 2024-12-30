@@ -7,7 +7,7 @@ import sys
 
 
 
-def process_unit_solution(instance_path, solution_path):
+def process_unit_solution(instance_path, solution_path, suffix):
     # LOAD
     data = {}
     with open(instance_path, 'r') as file:
@@ -41,10 +41,10 @@ def process_unit_solution(instance_path, solution_path):
 
 
     # Export
-    instance_path_orig = instance_path.replace("_unit.json", ".json")
+    instance_path_orig = instance_path.replace(suffix, ".json")
     solution["instance"] = instance_path_orig
 
-    solution_path_new = solution_path.replace("_unit.json", ".json")
+    solution_path_new = solution_path.replace(suffix, ".json")
 
     with open(solution_path_new, "w") as outfile:
         json.dump(solution, outfile, indent=4)
