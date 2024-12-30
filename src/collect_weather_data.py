@@ -84,7 +84,7 @@ def fetch_weather_data():
             for cell in cells:
                 header = cell.get_attribute("headers")
                 value = cell.text.strip()
-                if value in ["-", "Unavailable", "Without Observation", "<1"]:
+                if value in ["-", "Unavailable", "Without Observation", "<1", "TRACE"]:
                     value = None
 
                 if header == "OBS_Time":
