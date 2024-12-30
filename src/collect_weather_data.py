@@ -121,7 +121,6 @@ def fetch_weather_data():
             ''', (
                 station,
                 current_timestamp,  # Use the generated timestamp
-                data["observe_time"],
                 data["temperature"],
                 data["weather"],
                 data["wind_direction"],
