@@ -17,7 +17,11 @@ def load_solution(solution_path):
     return solution['routes']  # Assuming the solution file contains a key 'routes'
 
 # Visualize the paths on a map
-def visualize_tsp_paths(instance, tsp_routes, map_output="./results/visualizations/routes_map.html"):
+def visualize_solution(instance_path, solution_path, map_output):
+    instance = load_instance(instance_path)
+    tsp_routes = load_solution(solution_path)
+
+
     # Convert stations to a DataFrame for easy handling
     stations = pd.DataFrame(instance['stations'])
 
@@ -85,16 +89,13 @@ def visualize_tsp_paths(instance, tsp_routes, map_output="./results/visualizatio
     mymap.save(map_output)
     print(f"Map saved as '{map_output}'")
 
-# Example usage
-instance_path = "./data/instances_v4/v12-24-24_b8h_d12.json"  # Path to the generated instance file
-solution_path = "./results/unit_v4/v12-24-24_b8h_d12.json"  # Path to the TSP solution file
-save_path = solution_path.replace('.json', '.html')
-# solution = solution_path.split('/')[-1].split('.')[0]
-# save_path = f"./results/visualizations/v4/{solution}.html"
 
-# Load instance and solution
-instance = load_instance(instance_path)
-tsp_routes = load_solution(solution_path)
 
-# Visualize the TSP solution
-visualize_tsp_paths(instance, tsp_routes, save_path)
+
+if __name__ == "__main__":
+    instance_path = "./data/instances_v4/v12-24-24_b8h_d12.json"
+    solution_path = "./results/unit_v4/v12-24-24_b8h_d12.json"
+    save_path = solution_path.replace('.json', '.html')
+
+    visualize_solution(instance_path, solution_path, save_path)
+    

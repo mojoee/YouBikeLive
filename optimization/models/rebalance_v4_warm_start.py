@@ -1,17 +1,24 @@
 #!/usr/bin/env python3
 
 import os
+import sys
 import json
+
+# Add the src directory to sys.path
+src_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'src'))
+sys.path.append(src_path)
+
 
 from rebalance_v4 import rebalance_v4
 from generate_unit_instance import generate_unit_instance_v4
 from process_unit_solution import process_unit_solution
+from createSolutionVisualization_v4 import visualize_solution
 
 
 instance = "./data/instances_v4/v12-24-24_b8h_d12/NTU.json"
 solution_dir = "./results/ws_v4/v12-24-24_b8h_d12/"
 time_limit_init = 30
-time_limit_unit = 300
+time_limit_unit = 30
 
 os.makedirs(solution_dir, exist_ok=True)
 problem_name = instance.split("/")[-1].replace(".json", "")
@@ -61,3 +68,9 @@ else:
 
 # Process unit solution
 process_unit_solution(instance_unit, solution_unit)
+
+# Create visualization
+solution_path = solution_dir + problem_name + ".json"
+save_path = solution_path.replace('.json', '.html')
+
+visualize_solution(instance, solution_path, save_path)
