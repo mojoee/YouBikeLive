@@ -14,14 +14,34 @@ from generate_unit_instance import generate_unit_instance_v4
 from process_unit_solution import process_unit_solution
 from createSolutionVisualization_v4 import visualize_solution
 
+class Tee:
+    def __init__(self, *files):
+        self.files = files
 
-instance = "./data/instances_v4/v12-24-24_b8h_d12/NTU.json"
-solution_dir = "./results/ws_v4/v12-24-24_b8h_d12/"
-time_limit_init = 30
-time_limit_unit = 30
+    def write(self, obj):
+        for f in self.files:
+            f.write(obj)
+            f.flush()  # Ensure the output is written immediately
+
+    def flush(self):
+        for f in self.files:
+            f.flush()
+
+
+instance = "./data/instances_v4/v12-24-24_b8h_d12.json"
+solution_dir = "./results/ws_v4/"
+time_limit_init = 30*60
+time_limit_unit = 30*60
 
 os.makedirs(solution_dir, exist_ok=True)
 problem_name = instance.split("/")[-1].replace(".json", "")
+
+# Redirect stdout to log file
+log_file_path = solution_dir + problem_name + ".log"
+log_file = open(log_file_path, 'w')
+original_stdout = sys.stdout
+sys.stdout = Tee(sys.stdout, log_file)
+
 
 # SOLVE ORIGINAL INSTANCE WITHOUT LOAD SPLITTING
 solution_init = solution_dir + problem_name + "_init.json"
@@ -29,6 +49,10 @@ if os.path.exists(solution_init):
     print(f"solution_init already exists: {solution_init}")
 else:
     rebalance_v4(instance, solution_init, time_limit_init)
+
+# Create final solution visualization
+save_path = solution_init.replace('.json', '.html')
+visualize_solution(instance, solution_init, save_path)
 
 # GENERATE UNIT INSTANCE
 instance_dir = instance.rsplit("/", 1)[0] + "/"
@@ -69,8 +93,12 @@ else:
 # Process unit solution
 process_unit_solution(instance_unit, solution_unit)
 
-# Create visualization
+# Create final solution visualization
 solution_path = solution_dir + problem_name + ".json"
 save_path = solution_path.replace('.json', '.html')
-
 visualize_solution(instance, solution_path, save_path)
+
+# Reset stdout
+sys.stdout = original_stdout
+log_file.close()
+print(f"Log file saved at: {log_file_path}")
