@@ -23,19 +23,22 @@ def process_unit_solution(instance_path, solution_path, suffix):
         # print(route_parents)
         loads = rt["leaving_load"]
         # print(loads)    
-        route_merged = [data["stations"][route.pop()]["parent_id"]]
-        loads_merged = [loads.pop()]
-        while(len(route) > 0):
-            node = route.pop()
-            load = loads.pop()
-            node_parent = data["stations"][node]["parent_id"]
-            if route_merged[-1] != node_parent:
-                route_merged.append(node_parent)
-                loads_merged.append(load)
-        route_merged.reverse()
-        loads_merged.reverse()
-        # print(route_merged)
-        # print(loads_merged)
+        route_merged = []
+        loads_merged = []
+        if len(route) > 0:
+            route_merged = [data["stations"][route.pop()]["parent_id"]]
+            loads_merged = [loads.pop()]
+            while(len(route) > 0):
+                node = route.pop()
+                load = loads.pop()
+                node_parent = data["stations"][node]["parent_id"]
+                if route_merged[-1] != node_parent:
+                    route_merged.append(node_parent)
+                    loads_merged.append(load)
+            route_merged.reverse()
+            loads_merged.reverse()
+            # print(route_merged)
+            # print(loads_merged)
         rt["route"] = route_merged
         rt["leaving_load"] = loads_merged
 
