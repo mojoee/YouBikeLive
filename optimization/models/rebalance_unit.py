@@ -3,8 +3,12 @@
 import sys
 import os
 
-from generate_unit_instance import generate_unit_instance_v1, generate_unit_instance_v2, generate_unit_instance_v3, generate_unit_instance_v4, generate_cb_instance
-from process_unit_solution import process_split_solution
+src_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'src'))
+utils_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'utils'))
+sys.path.append(src_path)
+sys.path.append(utils_path)
+
+from split_delivery_utils import *
 
 # Different rebalancing functions
 from rebalance_v1_1 import rebalance_v1_1
@@ -82,7 +86,7 @@ def rebalance_unit(instance_path, solution_path, time_limit, remove, rebalancing
 if __name__ == "__main__":
     # PARAMETERS
     instance_path = "./data/instances_v4/v12-24-24_b8h_d12/NTU.json"
-    solution_dir = "./results/cb_v4/v12-24-24_b8h_d12/"
+    solution_dir = "./results/v4_cb/v12-24-24_b8h_d12/NTU/"
     time_limit = 10
     remove = False
     function_label = "v4_cb"
@@ -104,5 +108,3 @@ if __name__ == "__main__":
             function_label = sys.argv[i+1]
 
     rebalance_unit(instance_path, solution_path, time_limit, remove, function_label)
-
-# python3 ./optimization/models/rebalance_unit.py -i data/instances_v1/instance_test_12:30_v5_c20.json -o ./results/unit_v1-1/instance_test_12:30_v5_c20_1min.json -t 60 -f v1_1
