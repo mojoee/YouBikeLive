@@ -477,19 +477,17 @@ def process_split_solution(instance, solution_split, solution_out):
 
 if __name__ == "__main__":
     instance_path = "data/instances_v4/v12-24-24_b8h_d12/NTU.json"
-    output_path = instance_path.replace(".json", "_cb.json")
-    
+    output_path = instance_path.replace(".json", "_cb.json")    
     generate_cb_instance(instance_path, output_path)
 
-    # output_path = instance_path.replace(".json", "_unit.json")
+    instance_path = "data/instances_v4/v12-24-24_b8h_d12/NTU.json"
+    output_path = instance_path.replace(".json", "_unit.json")
     # generate_unit_instance_v1(instance_path, output_path)
     # generate_unit_instance_v2(instance_path, output_path)
     # generate_unit_instance_v3(instance_path, output_path)
-    # generate_unit_instance_v4(instance_path, output_path)
+    generate_unit_instance_v4(instance_path, output_path)
 
-
-    # PARAMETERS
-    # instance_path = "./data/instances_v4/n10_v4_d2_unit.json"
-    # solution_path_split = "./results/v4/n10_v4_d2_unit.json"
-    # solution_path = solution_path_split.replace("_unit.json", ".json")
-    # process_split_solution(instance_path, solution_path_split, solution_path)
+    instance_path = "./data/instances_v4/v12-24-24_b8h_d12/NTU_unit.json"
+    solution_path_split = "./results/unit_v4/v12-24-24_b8h_d12/NTU_unit.json"
+    solution_path = solution_path_split.replace("_unit.json", ".json")
+    process_split_solution(instance_path, solution_path_split, solution_path)
