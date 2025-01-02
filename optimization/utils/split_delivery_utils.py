@@ -2,7 +2,41 @@
 
 import json
 import numpy as np
-import sys
+
+
+
+def generate_init_unit_routes(instance_unit, solution_init):
+    """
+    Given an instance_unit and a solution_init to original instance, generate the initial routes for the instance_unit.
+    """
+
+    # Get station mapping: parent_id in instance -> list of child ids in instance_unit
+    instance_unit_data = json.load(open(instance_unit))
+    station_mapping = {} 
+    for st in instance_unit_data["stations"]:
+        parent_id = st["parent_id"]
+        if parent_id not in station_mapping:
+            station_mapping[parent_id] = [st["id"]]
+        else: 
+            station_mapping[parent_id].append(st["id"])
+
+    # Get solution_init data
+    solution_init_data = json.load(open(solution_init))
+    routes_init = []
+    for rd in solution_init_data["routes"]:
+        route_init = []
+
+        el = 0 # entry load
+        for st, ll in zip(rd["route"], rd["leaving_load"]): # station, leaving load
+            ld = abs(ll - el) # load difference
+            el = ll
+            popped_nodes = station_mapping[st][:ld]
+            del station_mapping[st][:ld]
+            route_init.extend(popped_nodes)
+        routes_init.append(route_init)
+    return routes_init
+
+
 
 
 def generate_unit_instance_v1(instance_path, output_path):
@@ -391,9 +425,53 @@ def generate_cb_instance(instance_path, output_path):
     with open(output_path, "w") as outfile:
         json.dump(data_new, outfile, indent=None if stCnt_new > 200 else 4)
         print("Exported instance", output_path)
-
-
     return
+
+
+
+
+def process_split_solution(instance, solution_split, solution_out):
+    # LOAD
+    data = {}
+    with open(instance, 'r') as file:
+        data = json.load(file)
+
+    solution = {}
+    with open(solution_split, 'r') as file:
+        solution = json.load(file)
+
+    for rt in solution["routes"]:
+        route = rt["route"]
+        # route_parents = [data["stations"][node]["parent_id"] for node in route]
+        # print(route_parents)
+        loads = rt["leaving_load"]
+        # print(loads)    
+        route_merged = []
+        loads_merged = []
+        if len(route) > 0:
+            route_merged = [data["stations"][route.pop()]["parent_id"]]
+            loads_merged = [loads.pop()]
+            while(len(route) > 0):
+                node = route.pop()
+                load = loads.pop()
+                node_parent = data["stations"][node]["parent_id"]
+                if route_merged[-1] != node_parent:
+                    route_merged.append(node_parent)
+                    loads_merged.append(load)
+            route_merged.reverse()
+            loads_merged.reverse()
+            # print(route_merged)
+            # print(loads_merged)
+        rt["route"] = route_merged
+        rt["leaving_load"] = loads_merged
+
+
+    # Export
+    solution["instance"] = instance
+    with open(solution_out, "w") as outfile:
+        json.dump(solution, outfile, indent=4)
+        print("Unit solution processed, exported", solution_out)
+
 
 
 
@@ -408,3 +486,10 @@ if __name__ == "__main__":
     # generate_unit_instance_v2(instance_path, output_path)
     # generate_unit_instance_v3(instance_path, output_path)
     # generate_unit_instance_v4(instance_path, output_path)
+
+
+    # PARAMETERS
+    # instance_path = "./data/instances_v4/n10_v4_d2_unit.json"
+    # solution_path_split = "./results/v4/n10_v4_d2_unit.json"
+    # solution_path = solution_path_split.replace("_unit.json", ".json")
+    # process_split_solution(instance_path, solution_path_split, solution_path)

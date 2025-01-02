@@ -4,7 +4,7 @@ import sys
 import os
 
 from generate_unit_instance import generate_unit_instance_v1, generate_unit_instance_v2, generate_unit_instance_v3, generate_unit_instance_v4, generate_cb_instance
-from process_unit_solution import process_unit_solution
+from process_unit_solution import process_split_solution
 
 # Different rebalancing functions
 from rebalance_v1_1 import rebalance_v1_1
@@ -68,7 +68,7 @@ def rebalance_unit(instance_path, solution_path, time_limit, remove, rebalancing
     rebalancing_function(unit_instance_path, unit_solution_path, time_limit)
 
     # 3) Process unit solution
-    process_unit_solution(unit_instance_path, unit_solution_path, suffix)
+    process_split_solution(unit_instance_path, unit_solution_path, solution_path)
 
     # 4) Clean mess
     if remove:

@@ -1,5 +1,5 @@
 {
-    "instance": "./data/instances_v4/v12-24-24_b8h_d12/NTU.json",
+    "instance": "./data/instances_v4/v12-24-24_b8h_d12/NTU_unit.json",
     "time_limit": 30,
     "running_time": 30,
     "status": "FEASIBLE",

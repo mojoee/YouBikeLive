@@ -2,64 +2,49 @@
 
 import os
 import sys
-import json
 
-# Add the src directory to sys.path
 src_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'src'))
+utils_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'utils'))
 sys.path.append(src_path)
-
+sys.path.append(utils_path)
 
 from rebalance_v4 import rebalance_v4
-from generate_unit_instance import generate_cb_instance, generate_unit_instance_v4
-from process_unit_solution import process_unit_solution
+from split_delivery_utils import *
 from createSolutionVisualization_v4 import visualize_solution
-
-class Tee:
-    def __init__(self, *files):
-        self.files = files
-
-    def write(self, obj):
-        for f in self.files:
-            f.write(obj)
-            f.flush()  # Ensure the output is written immediately
-
-    def flush(self):
-        for f in self.files:
-            f.flush()
+from tee import Tee
 
 
+
+
+# Parameters
 instance = "./data/instances_v4/v12-24-24_b8h_d12/NTU.json"
-solution_dir = "./results/v4_cbws/"
-time_limit_init = 30
-time_limit_unit = 30
+solution_dir = "./results/v4_cbws/NTU/"
+time_limit_init = 10
+time_limit_unit = 10
+
 
 os.makedirs(solution_dir, exist_ok=True)
+
 problem_name = instance.split("/")[-1].replace(".json", "")
+instance_dir = instance.rsplit("/", 1)[0] + "/"
 
 # Redirect stdout to log file
 log_file_path = solution_dir + problem_name + ".log"
 log_file = open(log_file_path, 'w')
-original_stdout = sys.stdout
 sys.stdout = Tee(sys.stdout, log_file)
+sys.stderr = Tee(sys.stderr, log_file)
 
 # Generate capacity-bounded instance
-instance_dir = instance.rsplit("/", 1)[0] + "/"
 instance_cb = instance_dir + problem_name + "_cb.json"
-if os.path.exists(instance_cb):
-    print(f"instance_cb already exists: {instance_cb}")
-else:
-    generate_cb_instance(instance, instance_cb)
+generate_cb_instance(instance, instance_cb) if not os.path.exists(instance_cb) else print(f"instance_cb already exists: {instance_cb}")
 
 # Solve capacity-bounded instance
 solution_cb = solution_dir + problem_name + "_init_cb.json"
-if os.path.exists(solution_cb):
-    print(f"solution_init already exists: {solution_cb}")
-else:
-    rebalance_v4(instance_cb, solution_cb, time_limit_init)
-
+rebalance_v4(instance_cb, solution_cb, time_limit_init) if not os.path.exists(solution_cb) else print(f"solution_cb already exists: {solution_cb}")
+    
 # Generate initial solution (solution_cb -> solution_init)
-process_unit_solution(instance_cb, solution_cb, "_cb.json")
 solution_init = solution_dir + problem_name + "_init.json"
+process_split_solution(instance_cb, solution_cb, solution_init)
 
 # Visualize initial solution
 save_path = solution_init.replace('.json', '.html')
@@ -67,119 +52,19 @@ visualize_solution(instance, solution_init, save_path)
 
 # Generate unit instance
 instance_unit = instance_dir + problem_name + "_unit.json"
-if os.path.exists(instance_unit):
-    print(f"instance_unit already exists: {instance_unit}")
-else:
-    generate_unit_instance_v4(instance, instance_unit)
+generate_unit_instance_v4(instance, instance_unit) if not os.path.exists(instance_unit) else print(f"instance_unit already exists: {instance_unit}")
 
-# Transform solution_init to solution_init_unit
-solution_init_unit = solution_dir + problem_name + "_init_unit.json"
-
-# Get station mapping: parent_id in instance -> list of child ids in instance_unit
-instance_unit_data = json.load(open(instance_unit))
-station_mapping = {} 
-for st in instance_unit_data["stations"]:
-    parent_id = st["parent_id"]
-    if parent_id not in station_mapping:
-        station_mapping[parent_id] = [st["id"]]
-    else: 
-        station_mapping[parent_id].append(st["id"])
-
-# Get solution_init data
-solution_init_data = json.load(open(solution_init))
-routes_init = []
-for rd in solution_init_data["routes"]:
-    route_init = []
-
-    el = 0 # entry load
-    for st, ll in zip(rd["route"], rd["leaving_load"]): # station, leaving load
-        ld = abs(ll - el) # load difference
-        el = ll
-        popped_nodes = station_mapping[st][:ld]
-        del station_mapping[st][:ld]
-        route_init.extend(popped_nodes)
-    routes_init.append(route_init)
+# Generate initial unit routes
+routes_init = generate_init_unit_routes(instance_unit, solution_init)
 
 # Solve unit instance with warm start
 solution_unit = solution_dir + problem_name + "_unit.json"
-if os.path.exists(solution_unit):
-    print(f"solution_unit already exists: {solution_unit}")
-else:
-    rebalance_v4(instance_unit, solution_unit, time_limit_unit, routes_init)
-
+rebalance_v4(instance_unit, solution_unit, time_limit_unit, routes_init) if not os.path.exists(solution_unit) else print(f"solution_unit already exists: {solution_unit}")
+    
 # Process unit solution
-process_unit_solution(instance_unit, solution_unit, "_unit.json")
+solution = solution_dir + problem_name + ".json"
+process_split_solution(instance_unit, solution_unit, solution)
 
 # Visualize final solution
-solution = solution_dir + problem_name + ".json"
 save_path = solution.replace('.json', '.html')
 visualize_solution(instance, solution, save_path)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# # Solve unit instance warm started with solution_cb
-# instance_cb_unit = instance_dir + problem_name + "_cb_unit.json"
-# if os.path.exists(instance_cb_unit):
-#     print(f"instance_cb_unit already exists: {instance_cb_unit}")
-# else:
-#     generate_unit_instance_v4(instance_cb, instance_cb_unit)
-
-# # Get station mapping: parent_id in instance -> list of child ids
-# instance_unit_data = json.load(open(instance_cb_unit))
-# station_mapping = {} 
-# for st in instance_unit_data["stations"]:
-#     parent_id = st["parent_id"]
-#     if parent_id not in station_mapping:
-#         station_mapping[parent_id] = [st["id"]]
-#     else: 
-#         station_mapping[parent_id].append(st["id"])
-
-# # Get solution_init data
-# solution_init_data = json.load(open(solution_cb))
-# routes_init = []
-# for rd in solution_init_data["routes"]:
-#     route_init = []
-#     for st in rd["route"]:
-#         route_init.extend(station_mapping[st])
-#     routes_init.append(route_init)
-
-# # Solve unit instance with warm start
-# solution_cb_unit = solution_dir + problem_name + "_cb_unit.json"
-# if os.path.exists(solution_cb_unit):
-#     print(f"solution_cb_unit already exists: {solution_cb_unit}")
-# else:
-#     rebalance_v4(instance_cb_unit, solution_cb_unit, time_limit_unit, routes_init)
-
-# # Process unit solution
-# process_unit_solution(instance_unit, solution_unit)
-
-# # Create final solution visualization
-# solution_path = solution_dir + problem_name + ".json"
-# save_path = solution_path.replace('.json', '.html')
-# visualize_solution(instance, solution_path, save_path)
-
-# # Reset stdout
-# sys.stdout = original_stdout
-# log_file.close()
-# print(f"Log file saved at: {log_file_path}")

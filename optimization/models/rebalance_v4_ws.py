@@ -4,28 +4,17 @@ import os
 import sys
 import json
 
-# Add the src directory to sys.path
 src_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'src'))
+utils_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'utils'))
 sys.path.append(src_path)
+sys.path.append(utils_path)
 
 
 from rebalance_v4 import rebalance_v4
 from generate_unit_instance import generate_unit_instance_v4
-from process_unit_solution import process_unit_solution
+from process_unit_solution import process_split_solution
 from createSolutionVisualization_v4 import visualize_solution
-
-class Tee:
-    def __init__(self, *files):
-        self.files = files
-
-    def write(self, obj):
-        for f in self.files:
-            f.write(obj)
-            f.flush()  # Ensure the output is written immediately
-
-    def flush(self):
-        for f in self.files:
-            f.flush()
+from tee import Tee
 
 
 instance = "./data/instances_v4/v12-24-24_b8h_d12/NTU.json"
@@ -36,11 +25,10 @@ time_limit_unit = 30
 os.makedirs(solution_dir, exist_ok=True)
 problem_name = instance.split("/")[-1].replace(".json", "")
 
-# Redirect stdout to log file
 log_file_path = solution_dir + problem_name + ".log"
-log_file = open(log_file_path, 'w')
-original_stdout = sys.stdout
-sys.stdout = Tee(sys.stdout, log_file)
+
+# Redirect stdout to log file
+sys.stdout = Tee(sys.stdout, open(log_file_path, 'w'))
 
 
 # SOLVE ORIGINAL INSTANCE WITHOUT LOAD SPLITTING
@@ -91,14 +79,9 @@ else:
     rebalance_v4(instance_unit, solution_unit, time_limit_unit, routes_init)
 
 # Process unit solution
-process_unit_solution(instance_unit, solution_unit, "_unit.json")
+solution = solution_dir + problem_name + ".json"
+process_split_solution(instance_unit, solution_unit, solution)
 
 # Create final solution visualization
-solution_path = solution_dir + problem_name + ".json"
-save_path = solution_path.replace('.json', '.html')
-visualize_solution(instance, solution_path, save_path)
-
-# Reset stdout
-sys.stdout = original_stdout
-log_file.close()
-print(f"Log file saved at: {log_file_path}")
+save_path = solution.replace('.json', '.html')
+visualize_solution(instance, solution, save_path)
