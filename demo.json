@@ -1,0 +1,38 @@
+{
+    "instance": "./data/instances_v1/demo.json",
+    "time_limit": 5,
+    "running_time": 5,
+    "status": "FEASIBLE",
+    "objectives": [
+        {
+            "name": "max_distance",
+            "value": 19,
+            "bound": 11,
+            "gap": 0.42105263157894735
+        }
+    ],
+    "routes": [
+        {
+            "route": [
+                4,
+                1,
+                2
+            ],
+            "leaving_load": [
+                12,
+                5,
+                0
+            ]
+        },
+        {
+            "route": [
+                3,
+                0
+            ],
+            "leaving_load": [
+                8,
+                0
+            ]
+        }
+    ]
+}

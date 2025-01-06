@@ -3,8 +3,12 @@
 import sys
 import os
 
-from generate_unit_instance import generate_unit_instance_v1, generate_unit_instance_v2, generate_unit_instance_v3, generate_unit_instance_v4
-from process_unit_solution import process_unit_solution
+src_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'src'))
+utils_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'utils'))
+sys.path.append(src_path)
+sys.path.append(utils_path)
+
+from split_delivery_utils import *
 
 # Different rebalancing functions
 from rebalance_v1_1 import rebalance_v1_1
@@ -20,7 +24,8 @@ rebalancing_map = {
     "v1_2_minmax": rebalance_v1_2_minmax,
     "v2_1_minmax": rebalance_v2_1_minmax,
     "v3_1_minmax": rebalance_v3_1_minmax,
-    "v4": rebalance_v4
+    "v4": rebalance_v4, 
+    "v4_cb": rebalance_v4
 }
 
 unit_instance_generator_map = {
@@ -29,7 +34,18 @@ unit_instance_generator_map = {
     "v1_2_minmax": generate_unit_instance_v1, 
     "v2_1_minmax": generate_unit_instance_v2,
     "v3_1_minmax":generate_unit_instance_v3,
-    "v4": generate_unit_instance_v4
+    "v4": generate_unit_instance_v4, 
+    "v4_cb": generate_cb_instance
+}
+
+suffix_map = {
+    "v1_1": "_unit.json",
+    "v1_2": "_unit.json",
+    "v1_2_minmax": "_unit.json",
+    "v2_1_minmax": "_unit.json",
+    "v3_1_minmax": "_unit.json",
+    "v4": "_unit.json",
+    "v4_cb": "_cb.json"
 }
 
 
@@ -38,9 +54,10 @@ def rebalance_unit(instance_path, solution_path, time_limit, remove, rebalancing
     Applies given rebalancing function to unit instance. 
     In effect achieving split loading and deliveries.
     """
+    suffix = suffix_map[rebalancing_label]
 
     # 1) Generate unit instance
-    unit_instance_path = instance_path.replace(".json", "_unit.json")
+    unit_instance_path = instance_path.replace(".json", suffix)
 
     if os.path.exists(unit_instance_path):
         print("Unit instance already exists:", unit_instance_path)
@@ -50,12 +67,12 @@ def rebalance_unit(instance_path, solution_path, time_limit, remove, rebalancing
         unit_instance_generator(instance_path, unit_instance_path)
 
     # 2) Solve unit instance
-    unit_solution_path = solution_path.replace(".json", "_unit.json")
+    unit_solution_path = solution_path.replace(".json", suffix)
     rebalancing_function = rebalancing_map[rebalancing_label]
     rebalancing_function(unit_instance_path, unit_solution_path, time_limit)
 
     # 3) Process unit solution
-    process_unit_solution(unit_instance_path, unit_solution_path)
+    process_split_solution(unit_instance_path, unit_solution_path, solution_path)
 
     # 4) Clean mess
     if remove:
@@ -69,10 +86,10 @@ def rebalance_unit(instance_path, solution_path, time_limit, remove, rebalancing
 if __name__ == "__main__":
     # PARAMETERS
     instance_path = "./data/instances_v4/v12-24-24_b8h_d12/NTU.json"
-    solution_dir = "./results/unit_v4/v12-24-24_b8h_d12/"
-    time_limit = 30
+    solution_dir = "./results/v4_cb/v12-24-24_b8h_d12/NTU/"
+    time_limit = 10
     remove = False
-    function_label = "v4"
+    function_label = "v4_cb"
 
     name = instance_path.split('/')[-1]
     solution_path = solution_dir + name
@@ -91,5 +108,3 @@ if __name__ == "__main__":
             function_label = sys.argv[i+1]
 
     rebalance_unit(instance_path, solution_path, time_limit, remove, function_label)
-
-# python3 ./optimization/models/rebalance_unit.py -i data/instances_v1/instance_test_12:30_v5_c20.json -o ./results/unit_v1-1/instance_test_12:30_v5_c20_1min.json -t 60 -f v1_1
