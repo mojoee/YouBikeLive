@@ -18,29 +18,28 @@ distances = instance["distances"]
 assert stations_cnt == len(distances) == len(distances[0])
 print("stations_cnt:" , stations_cnt)
 
-# id1 = 0
-# id2 = np.argmax(dist_matrix[0])
-# max0 = max(dist_matrix[0])
-# print(id1, id2, max0)
-# print(stations[id1])
-# print(stations[id2])
-# id1 = 0
-# id2 = np.argmin(dist_matrix[0][1:]) + 1
-# min0 = min(dist_matrix[0][1:])
-# print(id1, id2, min0)
-# print(stations[id1])
-# print(stations[id2])
 
-# TODO temporary fill in: c_reward = 1, demand = +-1
+# temporary fill in: c_reward = 1, demand = +-1
+total_capacity = sum([station["capacity"] for station in stations])
+s_init_sum = sum([station["s_init"] for station in stations])
+rel_occupancy = s_init_sum / total_capacity
+
+print("total_capacity:", total_capacity)
+print("s_init_sum:", s_init_sum)
+print("rel_occupancy:", rel_occupancy)
+
 for station in stations:
     station["c_reward"] = 1
-    station["s_init"] = (station["id"] % 2) * 12
-    station["s_goal"] = ((station["id"] + 1) % 2) * 12
-
-s_init_sum = sum([station["s_init"] for station in stations])
+    station["s_goal"] = int(rel_occupancy * station["capacity"])
 s_goal_sum = sum([station["s_goal"] for station in stations])
+
+while s_goal_sum < s_init_sum:
+    station = np.random.choice(stations)
+    if station["s_goal"] < station["capacity"]:
+        station["s_goal"] += 1
+        s_goal_sum += 1
+
 demand_sum = sum([station["s_goal"] - station["s_init"] for station in stations])
-print("s_init_sum:", s_init_sum)
 print("s_goal_sum:", s_goal_sum)
 print("demand_sum:", demand_sum)
 print()
