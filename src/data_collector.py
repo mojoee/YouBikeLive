@@ -91,7 +91,7 @@ def fetch_and_store():
 # Retry mechanism
 while True:
     try:
-        schedule.every(1).minutes.do(fetch_and_store)
+        schedule.every(10).minutes.do(fetch_and_store)
 
         # Run the scheduler
         while True:

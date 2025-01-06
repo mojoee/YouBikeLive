@@ -32,14 +32,21 @@ default_station = {
 }
 
 
-# Fetch stations data
-df_stations = fetch_stations(time_of_interest_start, time_of_interest_end, db_path)
+class NumpyEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, np.integer):
+            return int(obj)
+        elif isinstance(obj, np.floating):
+            return float(obj)
+        elif isinstance(obj, np.ndarray):
+            return obj.tolist()
+        return super(NumpyEncoder, self).default(obj)
 
 def load_and_preprocess_station(station_id):
     conn = sqlite3.connect(db_path)
     query = f"""
     SELECT *
-    FROM youbike_data
+    FROM youbike_status
     WHERE sno = '{station_id}'
     ORDER BY mday ASC;
     """
@@ -55,7 +62,7 @@ def load_and_preprocess_station(station_id):
     df = df.drop(columns=non_numeric_cols, errors='ignore')
 
     # Resample and fill missing values
-    df = df.resample('1h').mean().ffill()
+    df = df.resample('1h').mean().round().ffill()
 
     # Ensure `capacity` is present
     if 'capacity' not in df.columns:
@@ -110,13 +117,14 @@ def predict_station_demand_naive(station_id, forecast_date=None):
         forecast_date = (pd.to_datetime(last_date) + pd.Timedelta(days=1)).date()
 
     forecast_start = pd.to_datetime(forecast_date)
-    forecast_end = forecast_start + pd.Timedelta(days=7, hours=23)
+    forecast_end = forecast_start + pd.Timedelta(days=0, hours=23)
     hours = pd.date_range(start=forecast_start, end=forecast_end, freq='1H')
 
     predicted_values = []
     for hour in hours:
         prev_day = hour - pd.Timedelta(days=1)
         prev_week = hour - pd.Timedelta(days=7)
+        # maybe can think about more sophisticated approach here. 
 
         if (prev_day in df.index) and (prev_week in df.index):
             val_prev_day = df.loc[prev_day, 'demand']
@@ -128,28 +136,17 @@ def predict_station_demand_naive(station_id, forecast_date=None):
 
     return predicted_values
 
+
 def find_optimal_starting_point(hourly_demands, station_capacity):
-    best_s = None
-    best_score = float('inf')
+    max_demand = max(hourly_demands)
+    min_demand = min(hourly_demands)
+    range_demand = max_demand - min_demand
+    if range_demand == 0:
+        s_goal = station_capacity / 2
+    else:
+        s_goal = station_capacity/range_demand*max_demand
+    return int(s_goal)
 
-    for s in range(0, station_capacity + 1):
-        inventory = s
-        score = 0
-
-        for demand in hourly_demands:
-            inventory -= demand
-            if inventory < 0:
-                score += abs(inventory)
-                inventory = 0
-            elif inventory > station_capacity:
-                score += (inventory - station_capacity)
-                inventory = station_capacity
-
-        if score < best_score:
-            best_score = score
-            best_s = s
-
-    return {"best_starting_inventory": best_s, "score": best_score}
 
 def get_station_capacity(df, sno, default_capacity=10):
     matching_rows = df.loc[df["sno"] == sno]
@@ -159,27 +156,53 @@ def get_station_capacity(df, sno, default_capacity=10):
         print(f"Warning: Station {sno} not found in df_stations. Using default capacity.")
         return default_capacity
 
+
+def get_station_available_bikes_at_time(sno, time):
+    conn = sqlite3.connect(db_path)
+    query = f"""
+    SELECT *
+    FROM youbike_status
+    WHERE sno = '{sno}' AND mday <= '{time}'
+    ORDER BY mday DESC
+    LIMIT 1;
+    """
+    df = pd.read_sql_query(query, conn)
+    conn.close()
+    if df.empty:
+        return 0
+    else:
+        return int(df['available_rent_bikes'].values[0])
+
+
 # Compute demands and balance s_init and s_goal
-predicted_demands = {}
+# Fetch stations data
+df_stations = fetch_stations(db_path)
+optimal_allocation = {}
 for sno in df_stations['sno']:
     hourly_demands = predict_station_demand_naive(sno)
     cap = get_station_capacity(df_stations, sno)
-    starting_point = find_optimal_starting_point(hourly_demands, cap)
-    predicted_demands[sno] = starting_point
+    s_goal = find_optimal_starting_point(hourly_demands, cap)
+    # get intial
+    # we need to calculate the 8 hour interval wich is best for rebalancing
+    # assuming that we rebalance from 00:00 to 08:00
+    s_init = get_station_available_bikes_at_time(sno, cfg.instance_start)
 
-total_s_init = df_stations['s_init'].sum()
-total_s_goal = sum(predicted_demands[sno]['best_starting_inventory'] for sno in df_stations['sno'])
+    optimal_allocation[sno] = (s_init, s_goal)
+
+total_s_init = sum([optimal_allocation[sno][0] for sno in df_stations['sno']])
+total_s_goal = sum([optimal_allocation[sno][1] for sno in df_stations['sno']])
 
 if total_s_goal != total_s_init:
     discrepancy = total_s_init - total_s_goal
     print(f"Balancing discrepancy: {discrepancy}")
-
-    for sno in df_stations['sno']:
-        if discrepancy == 0:
-            break
-        adjustment = np.sign(discrepancy)
-        predicted_demands[sno]['best_starting_inventory'] += adjustment
-        discrepancy -= adjustment
+    while discrepancy != 0:
+        for sno in df_stations['sno']:
+            if discrepancy == 0:
+                break
+            adjustment = np.sign(discrepancy)
+            optimal_allocation[sno] = (optimal_allocation[sno][0],
+                                       optimal_allocation[sno][1] + adjustment)
+            discrepancy -= adjustment
 
 # Generate instance data
 stations = []
@@ -191,14 +214,13 @@ for i, sno in enumerate(df_stations['sno']):
         "station_name": row['snaen'].values[0],
         "capacity": int(row['capacity'].values[0]),
         "district": row['sareaen'].values[0],
-        "s_init": int(row['s_init'].values[0]),
-        "s_goal": int(predicted_demands[sno]['best_starting_inventory']),
+        "s_init": int(optimal_allocation[sno][0]),
+        "s_goal": int(optimal_allocation[sno][1]),
         "coords": [row['latitude'].values[0], row['longitude'].values[0]],
-        "predicted_demand": predicted_demands[sno]
     }
     stations.append(station)
 
-distance_csv_path = "distance_matrix.csv"
+distance_csv_path = "distance_matrix_20250106.csv"
 df_distances = pd.read_csv(distance_csv_path, header=0)
 # stations = df_distances.columns.tolist()
 distance_matrix = df_distances.values.tolist()
@@ -221,9 +243,9 @@ instance = {
     }
 }
 
-name = f"test_{time_of_interest_start}_{time_of_interest_end}"
+name = f"instance1_{cfg.instance_start}"
 output_file = f"{output_dir}/instance_forecast_{name}.json"
 with open(output_file, "w") as f:
-    json.dump(instance, f, indent=4)
+    json.dump(instance, f, cls=NumpyEncoder, indent=4)
 
 print(f"Instance saved to {output_file}")
