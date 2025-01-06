@@ -5,7 +5,13 @@ import sys
 import json
 import os
 
+src_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'src'))
+utils_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'utils'))
+sys.path.append(src_path)
+sys.path.append(utils_path)
 
+from tee import Tee
+from createSolutionVisualization_v4 import visualize_solution
 
 
 def rebalance_v4(instance_path, solution_path, time_limit, routes_init=None):
@@ -194,16 +200,28 @@ if __name__ == "__main__":
     solution_dir = "./results/v4/v12-24-24_b8h_d12/"
     time_limit = 30
 
-    name = instance_path.split('/')[-1]
-    solution_path = solution_dir + name
-    os.makedirs(solution_dir, exist_ok=True)
-
     for i in range(len(sys.argv)):
         if sys.argv[i] == '-i':
             instance_path = sys.argv[i+1]
         elif sys.argv[i] == '-o':
-            solution_path = sys.argv[i+1]
+            solution_dir = sys.argv[i+1]
         elif sys.argv[i] == '-t':
             time_limit = int(sys.argv[i+1])
 
+    name = instance_path.split('/')[-1]
+    solution_path = solution_dir + name
+    os.makedirs(solution_dir, exist_ok=True)
+
+    # Redirect stdout to log file
+    problem_name = instance_path.split("/")[-1].replace(".json", "")
+    log_file_path = solution_dir + problem_name + ".log"
+    log_file = open(log_file_path, 'w')
+    sys.stdout = Tee(sys.stdout, log_file)
+    sys.stderr = Tee(sys.stderr, log_file)
+
+
     rebalance_v4(instance_path, solution_path, time_limit)
+
+    # Visualize final solution
+    save_path = solution_path.replace('.json', '.html')
+    visualize_solution(instance_path, solution_path, save_path)

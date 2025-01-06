@@ -9,6 +9,8 @@ sys.path.append(src_path)
 sys.path.append(utils_path)
 
 from split_delivery_utils import *
+from tee import Tee
+from createSolutionVisualization_v4 import visualize_solution
 
 # Different rebalancing functions
 from rebalance_v1_1 import rebalance_v1_1
@@ -91,15 +93,11 @@ if __name__ == "__main__":
     remove = False
     function_label = "v4_cb"
 
-    name = instance_path.split('/')[-1]
-    solution_path = solution_dir + name
-    os.makedirs(solution_dir, exist_ok=True)
-
     for i in range(len(sys.argv)):
         if sys.argv[i] == '-i':
             instance_path = sys.argv[i+1]
         elif sys.argv[i] == '-o':
-            solution_path = sys.argv[i+1]
+            solution_dir = sys.argv[i+1]
         elif sys.argv[i] == '-t':
             time_limit = int(sys.argv[i+1])
         elif sys.argv[i] == '-r':
@@ -107,4 +105,19 @@ if __name__ == "__main__":
         elif sys.argv[i] == '-f':
             function_label = sys.argv[i+1]
 
+    name = instance_path.split('/')[-1]
+    solution_path = solution_dir + name
+    os.makedirs(solution_dir, exist_ok=True)
+
+    # Redirect stdout to log file
+    problem_name = instance_path.split("/")[-1].replace(".json", "")
+    log_file_path = solution_dir + problem_name + ".log"
+    log_file = open(log_file_path, 'w')
+    sys.stdout = Tee(sys.stdout, log_file)
+    sys.stderr = Tee(sys.stderr, log_file)
+
     rebalance_unit(instance_path, solution_path, time_limit, remove, function_label)
+
+    # Visualize final solution
+    save_path = solution_path.replace('.json', '.html')
+    visualize_solution(instance_path, solution_path, save_path)
