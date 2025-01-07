@@ -5,9 +5,16 @@ import sys
 import json
 import os
 
+src_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'src'))
+utils_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'utils'))
+sys.path.append(src_path)
+sys.path.append(utils_path)
+
+from tee import Tee
+from createSolutionVisualization_v4 import visualize_solution
 
 
-def rebalance_v4(instance_path, solution_path, time_limit):
+def rebalance_v4(instance_path, solution_path, time_limit, routes_init=None):
     """
     1) Maximize cumulative reward for rebalancing.
     Limited trip duration = travel time + loading time * parking time.
@@ -49,8 +56,9 @@ def rebalance_v4(instance_path, solution_path, time_limit):
     print("Solving", instance_path)
     print("stations_cnt:", stations_cnt)
     print("demand_min:", min(demands_data))
-    print("demand_max", max(demands_data))
-    print("demands", demands_data)
+    print("demand_max:", max(demands_data))
+    print("abs_demands_total:", sum([abs(d) for d in demands_data]))
+    # print("demands", demands_data)
     print("vehicles_cnt:", vehicles_cnt)
     print("vehicles_capacities:", vehicles_capacities)
     print("vehicles_depots", vehicles_depots)
@@ -60,7 +68,7 @@ def rebalance_v4(instance_path, solution_path, time_limit):
     print("max_trip_duration:", max_trip_duration)
     print()
 
-        # MODEL
+    # MODEL
     with hexaly.optimizer.HexalyOptimizer() as optimizer:
         model = optimizer.model
 
@@ -76,7 +84,7 @@ def rebalance_v4(instance_path, solution_path, time_limit):
         routes = [model.list(stations_cnt) for _ in range(vehicles_cnt)] # Sequence of stations visited by each vehicle
 
         # INTERMEDIATE EXPRESSIONS
-        loads = [None] * vehicles_cnt # current vehicle loads at each station
+        loads = [None] * vehicles_cnt # current vehicle loads while leaving each station
         routes_costs = [None] * vehicles_cnt
         routes_rewards = [None] * vehicles_cnt
 
@@ -98,6 +106,14 @@ def rebalance_v4(instance_path, solution_path, time_limit):
             min_quantity_lambda = model.lambda_function(lambda i: loads[k][i] >= 0)
             model.constraint(model.and_(model.range(0, c), min_quantity_lambda))
 
+            # Return with empty vehicle # TODO this does not work as intended
+            # model.constraint(loads[k][c - 1] == 0)
+            # model.constraint(model.at(loads[k], c - 1) == 0)
+            # demand_lambda = model.lambda_function(lambda i: model.at(demands, route[i]))
+            # demand_sum = model.sum(model.range(0, c), demand_lambda)
+            # model.constraint(demand_sum == 0)
+
+
             # Distance traveled by each vehicle
             dist_lambda = model.lambda_function(lambda i: model.at(dist_matrix, route[i - 1], route[i]))
             depot_id = vehicles_depots[k]
@@ -117,6 +133,7 @@ def rebalance_v4(instance_path, solution_path, time_limit):
             # Contraint on total trip duration
             model.constraint(routes_costs[k] <= max_trip_duration)
 
+        
         # OBJECTIVES
         # 1) Maximize cumulative reward
         total_reward = model.sum(routes_rewards)
@@ -126,6 +143,19 @@ def rebalance_v4(instance_path, solution_path, time_limit):
         model.minimize(max_duration)
 
         model.close()
+
+        # SET INITIAL SOLUTION
+        if routes_init is not None:
+            print("Setting initial solution")
+            assert len(routes) == len(routes_init)
+            for i in range(len(routes)):
+                route = routes[i]
+                route_val = route.get_value()
+                route_val.clear()
+                route_init = routes_init[i]
+                for st in route_init:
+                    route_val.add(st)
+                # print(route_val)
 
         # SOLVE
         optimizer.param.time_limit = time_limit
@@ -148,7 +178,13 @@ def rebalance_v4(instance_path, solution_path, time_limit):
         for k in range(vehicles_cnt):
             route = [station for station in routes[k].value]
             leaving_load = [load for load in loads[k].value]
-            result["routes"].append({"reward": routes_rewards[k].value, "duration": routes_costs[k].value, "route": route, "leaving_load": leaving_load})        
+            result["routes"].append({
+                                    "id": k,
+                                    "depot_id": vehicles_depots[k],
+                                    "reward": routes_rewards[k].value, 
+                                     "duration": routes_costs[k].value, 
+                                     "route": route,
+                                     "leaving_load": leaving_load})        
         result_string = json.dumps(result, indent=4)
 
         with open(solution_path, "w") as outfile:
@@ -160,20 +196,32 @@ def rebalance_v4(instance_path, solution_path, time_limit):
 
 if __name__ == "__main__":
     # DEFAULT PARAMETERS
-    instance_path = "./data/instances_v4/n10_v4_d2.json"
-    solution_dir = "./results/v4/"
+    instance_path = "./data/instances_v4/v12-24-24_b8h_d12/NTU.json"
+    solution_dir = "./results/v4/v12-24-24_b8h_d12/"
     time_limit = 30
-
-    name = instance_path.split('/')[-1]
-    solution_path = solution_dir + name
-    os.makedirs(solution_dir, exist_ok=True)
 
     for i in range(len(sys.argv)):
         if sys.argv[i] == '-i':
             instance_path = sys.argv[i+1]
         elif sys.argv[i] == '-o':
-            solution_path = sys.argv[i+1]
+            solution_dir = sys.argv[i+1]
         elif sys.argv[i] == '-t':
             time_limit = int(sys.argv[i+1])
 
+    name = instance_path.split('/')[-1]
+    solution_path = solution_dir + name
+    os.makedirs(solution_dir, exist_ok=True)
+
+    # Redirect stdout to log file
+    problem_name = instance_path.split("/")[-1].replace(".json", "")
+    log_file_path = solution_dir + problem_name + ".log"
+    log_file = open(log_file_path, 'w')
+    sys.stdout = Tee(sys.stdout, log_file)
+    sys.stderr = Tee(sys.stderr, log_file)
+
+
     rebalance_v4(instance_path, solution_path, time_limit)
+
+    # Visualize final solution
+    save_path = solution_path.replace('.json', '.html')
+    visualize_solution(instance_path, solution_path, save_path)

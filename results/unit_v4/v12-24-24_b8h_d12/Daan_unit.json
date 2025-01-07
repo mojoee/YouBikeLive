@@ -1,0 +1,64 @@
+{
+    "instance": "./data/instances_v4/v12-24-24_b8h_d12/Daan_unit.json",
+    "time_limit": 30,
+    "running_time": 30,
+    "status": "FEASIBLE",
+    "objectives": [
+        {
+            "name": "total_reward",
+            "value": 6,
+            "bound": 6804,
+            "gap": 0.9991181657848325
+        },
+        {
+            "name": "max_duration",
+            "value": 565,
+            "bound": 0,
+            "gap": 1.0
+        }
+    ],
+    "routes": [
+        {
+            "id": 0,
+            "depot_id": 0,
+            "reward": 2,
+            "duration": 565,
+            "route": [
+                783,
+                1585
+            ],
+            "leaving_load": [
+                1,
+                0
+            ]
+        },
+        {
+            "id": 1,
+            "depot_id": 0,
+            "reward": 2,
+            "duration": 565,
+            "route": [
+                781,
+                1592
+            ],
+            "leaving_load": [
+                1,
+                0
+            ]
+        },
+        {
+            "id": 2,
+            "depot_id": 0,
+            "reward": 2,
+            "duration": 565,
+            "route": [
+                785,
+                1590
+            ],
+            "leaving_load": [
+                1,
+                0
+            ]
+        }
+    ]
+}

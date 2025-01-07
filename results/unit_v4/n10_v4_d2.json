@@ -1,0 +1,88 @@
+{
+    "instance": "./data/instances_v4/n10_v4_d2.json",
+    "time_limit": 30,
+    "running_time": 30,
+    "status": "FEASIBLE",
+    "objectives": [
+        {
+            "name": "total_reward",
+            "value": 76,
+            "bound": 312,
+            "gap": 0.7564102564102564
+        },
+        {
+            "name": "max_duration",
+            "value": 1645,
+            "bound": 0,
+            "gap": 1.0
+        }
+    ],
+    "routes": [
+        {
+            "id": 0,
+            "depot_id": 0,
+            "reward": 2,
+            "duration": 1245,
+            "route": [
+                2,
+                3
+            ],
+            "leaving_load": [
+                1,
+                0
+            ]
+        },
+        {
+            "id": 1,
+            "depot_id": 0,
+            "reward": 26,
+            "duration": 1642,
+            "route": [
+                0,
+                5,
+                7,
+                3
+            ],
+            "leaving_load": [
+                9,
+                13,
+                8,
+                0
+            ]
+        },
+        {
+            "id": 2,
+            "depot_id": 1,
+            "reward": 16,
+            "duration": 1595,
+            "route": [
+                6,
+                2,
+                1,
+                4,
+                8
+            ],
+            "leaving_load": [
+                4,
+                6,
+                3,
+                5,
+                0
+            ]
+        },
+        {
+            "id": 3,
+            "depot_id": 1,
+            "reward": 32,
+            "duration": 1645,
+            "route": [
+                5,
+                9
+            ],
+            "leaving_load": [
+                16,
+                0
+            ]
+        }
+    ]
+}
