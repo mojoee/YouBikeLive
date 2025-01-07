@@ -5,9 +5,10 @@ from geopy.distance import geodesic
 import json
 import os
 import matplotlib.pyplot as plt
-from utils import fetch_stations
-
+from DBIO import load_and_preprocess_station, fetch_stations, \
+                get_station_available_bikes_at_time
 from config import cfg
+from demand_prediction import DemandPredictionContext, NaiveDemandPredictionStrategy, ProphetDemandPredictionStrategy
 
 # ---------------------------------------
 # Configuration
@@ -31,6 +32,12 @@ default_station = {
     "predicted_demand": [0] * 24  # 24 hours of zero demand
 }
 
+if cfg.prediction_strategy == "prophet":
+    context = DemandPredictionContext(ProphetDemandPredictionStrategy())
+elif cfg.prediction_strategy == "naive":
+    context = DemandPredictionContext(NaiveDemandPredictionStrategy())
+else:
+    raise ValueError(f"Invalid prediction strategy: {cfg.prediction_strategy}")
 
 class NumpyEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -41,100 +48,6 @@ class NumpyEncoder(json.JSONEncoder):
         elif isinstance(obj, np.ndarray):
             return obj.tolist()
         return super(NumpyEncoder, self).default(obj)
-
-def load_and_preprocess_station(station_id):
-    conn = sqlite3.connect(db_path)
-    query = f"""
-    SELECT *
-    FROM youbike_status
-    WHERE sno = '{station_id}'
-    ORDER BY mday ASC;
-    """
-    df = pd.read_sql_query(query, conn)
-    conn.close()
-
-    # Ensure `mday` is in datetime format for resampling
-    df['mday'] = pd.to_datetime(df['mday'])
-    df = df.set_index('mday')
-
-    # Drop non-numeric columns
-    non_numeric_cols = df.select_dtypes(exclude=[np.number]).columns
-    df = df.drop(columns=non_numeric_cols, errors='ignore')
-
-    # Resample and fill missing values
-    df = df.resample('1h').mean().round().ffill()
-
-    # Ensure `capacity` is present
-    if 'capacity' not in df.columns:
-        global df_stations
-        cap = df_stations.loc[df_stations['sno'] == station_id, 'capacity']
-        if len(cap) > 0:
-            capacity = cap.iloc[0]
-        else:
-            capacity = df['available_rent_bikes'].max()  # Fallback guess
-        df['capacity'] = capacity
-    else:
-        capacity = df['capacity'].mean()
-
-    # Compute demand
-    demands = []
-    prev_bikes = None
-    prev_demand = 0
-    for t in df.index:
-        curr_bikes = df.at[t, 'available_rent_bikes']
-        if prev_bikes is None:
-            demand = 0
-        else:
-            raw_demand = prev_bikes - curr_bikes
-            if curr_bikes == 0:
-                if prev_bikes > 0:
-                    demand = prev_bikes
-                else:
-                    demand = prev_demand if prev_demand > 0 else 1
-            elif curr_bikes == capacity:
-                if prev_bikes < capacity:
-                    demand = prev_bikes - capacity
-                else:
-                    demand = prev_demand if prev_demand < 0 else -1
-            else:
-                demand = raw_demand
-
-        demands.append(demand)
-        prev_bikes = curr_bikes
-        prev_demand = demand
-
-    df['demand'] = demands
-    return df
-
-
-def predict_station_demand_naive(station_id, forecast_date=None):
-    df = load_and_preprocess_station(station_id)
-    if df.empty:
-        return [0] * 24
-
-    if forecast_date is None:
-        last_date = df.index[-1].date()
-        forecast_date = (pd.to_datetime(last_date) + pd.Timedelta(days=1)).date()
-
-    forecast_start = pd.to_datetime(forecast_date)
-    forecast_end = forecast_start + pd.Timedelta(days=0, hours=23)
-    hours = pd.date_range(start=forecast_start, end=forecast_end, freq='1H')
-
-    predicted_values = []
-    for hour in hours:
-        prev_day = hour - pd.Timedelta(days=1)
-        prev_week = hour - pd.Timedelta(days=7)
-        # maybe can think about more sophisticated approach here. 
-
-        if (prev_day in df.index) and (prev_week in df.index):
-            val_prev_day = df.loc[prev_day, 'demand']
-            val_prev_week = df.loc[prev_week, 'demand']
-            pred = (val_prev_day + val_prev_week) / 2.0
-            predicted_values.append(float(pred))
-        else:
-            predicted_values.append(0.0)
-
-    return predicted_values
 
 
 def find_optimal_starting_point(hourly_demands, station_capacity):
@@ -157,23 +70,6 @@ def get_station_capacity(df, sno, default_capacity=10):
         return default_capacity
 
 
-def get_station_available_bikes_at_time(sno, time):
-    conn = sqlite3.connect(db_path)
-    query = f"""
-    SELECT *
-    FROM youbike_status
-    WHERE sno = '{sno}' AND mday <= '{time}'
-    ORDER BY mday DESC
-    LIMIT 1;
-    """
-    df = pd.read_sql_query(query, conn)
-    conn.close()
-    if df.empty:
-        return 0
-    else:
-        return int(df['available_rent_bikes'].values[0])
-
-
 # Compute demands and balance s_init and s_goal
 # Fetch stations data
 distance_csv_path = "distance_matrix_20250106.csv"
@@ -193,7 +89,7 @@ for i, sno in enumerate(df_distances.columns):
 df_stations = fetch_stations(db_path)
 optimal_allocation = {}
 for sno in df_distances.columns:
-    hourly_demands = predict_station_demand_naive(sno)
+    hourly_demands = context.predict_demand(station_id=1)
     cap = get_station_capacity(df_stations, sno)
     s_goal = find_optimal_starting_point(hourly_demands, cap)
     # get intial

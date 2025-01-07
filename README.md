@@ -149,6 +149,7 @@ You can reach the web-hosted page [here](https://youbikelive-1997a5b6ef93.heroku
 - [x] Populate the two new tables with all the data
 - [ ] Figure out a way to calculate the demand
 - [x] Add scraping for the weather DB
+- [ ] checkout Nikos API
 
 See the [open issues](https://github.com/mojoee/YouBikeLive/issues) for a full list of proposed features (and known issues).
 
