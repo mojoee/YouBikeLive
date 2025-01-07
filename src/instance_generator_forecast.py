@@ -89,7 +89,7 @@ for i, sno in enumerate(df_distances.columns):
 df_stations = fetch_stations(db_path)
 optimal_allocation = {}
 for sno in df_distances.columns:
-    hourly_demands = context.predict_demand(station_id=1)
+    hourly_demands = context.predict_demand(station_id=sno)
     cap = get_station_capacity(df_stations, sno)
     s_goal = find_optimal_starting_point(hourly_demands, cap)
     # get intial

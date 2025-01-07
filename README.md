@@ -116,6 +116,12 @@ This section should list any major frameworks/libraries used to bootstrap your p
 
 You can easily download the project and host it locally.
 
+### Usage
+
+use the instance_generator_forecast.py to create instances with real-world data and forecasted demands
+
+you can then solve the instances with our mathematical solver
+
 ### Prerequisites
 
 If you want to host it locally, you need the following:
