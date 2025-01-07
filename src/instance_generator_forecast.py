@@ -176,9 +176,23 @@ def get_station_available_bikes_at_time(sno, time):
 
 # Compute demands and balance s_init and s_goal
 # Fetch stations data
+distance_csv_path = "distance_matrix_20250106.csv"
+df_distances = pd.read_csv(distance_csv_path, header=0)
+# stations = df_distances.columns.tolist()
+distance_matrix = df_distances.values.tolist()
+df_distances.index = df_distances.columns
+distance_matrix = []
+
+for i, sno in enumerate(df_distances.columns):
+    surr = []
+    for j, sno_2 in enumerate(df_distances.columns):
+        distance = int(df_distances[sno][sno_2])
+        surr.append(distance)
+    distance_matrix.append(surr)
+
 df_stations = fetch_stations(db_path)
 optimal_allocation = {}
-for sno in df_stations['sno']:
+for sno in df_distances.columns:
     hourly_demands = predict_station_demand_naive(sno)
     cap = get_station_capacity(df_stations, sno)
     s_goal = find_optimal_starting_point(hourly_demands, cap)
@@ -189,14 +203,14 @@ for sno in df_stations['sno']:
 
     optimal_allocation[sno] = (s_init, s_goal)
 
-total_s_init = sum([optimal_allocation[sno][0] for sno in df_stations['sno']])
-total_s_goal = sum([optimal_allocation[sno][1] for sno in df_stations['sno']])
+total_s_init = sum([optimal_allocation[sno][0] for sno in df_distances.columns])
+total_s_goal = sum([optimal_allocation[sno][1] for sno in df_distances.columns])
 
 if total_s_goal != total_s_init:
     discrepancy = total_s_init - total_s_goal
     print(f"Balancing discrepancy: {discrepancy}")
     while discrepancy != 0:
-        for sno in df_stations['sno']:
+        for sno in df_distances.columns:
             if discrepancy == 0:
                 break
             adjustment = np.sign(discrepancy)
@@ -206,7 +220,7 @@ if total_s_goal != total_s_init:
 
 # Generate instance data
 stations = []
-for i, sno in enumerate(df_stations['sno']):
+for i, sno in enumerate(df_distances.columns):
     row = df_stations[df_stations['sno'] == sno]
     station = {
         "id": i,
@@ -220,19 +234,6 @@ for i, sno in enumerate(df_stations['sno']):
     }
     stations.append(station)
 
-distance_csv_path = "distance_matrix_20250106.csv"
-df_distances = pd.read_csv(distance_csv_path, header=0)
-# stations = df_distances.columns.tolist()
-distance_matrix = df_distances.values.tolist()
-df_distances.index = df_distances.columns
-
-distance_matrix = []
-for i, sno in enumerate(df_stations['sno']):
-    surr = []
-    for j, sno_2 in enumerate(df_stations['sno']):
-        distance = int(df_distances[sno][sno_2])
-        surr.append(distance)
-    distance_matrix.append(surr)
 
 instance = {
     "stations": stations,
