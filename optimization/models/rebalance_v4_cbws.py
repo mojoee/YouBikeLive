@@ -69,7 +69,18 @@ def rebalance_v4_cbws(instance, solution_dir, time_limit_init, time_limit_unit):
 if __name__ == "__main__":
     instance = "./data/instances_v4/v12-24-24_b8h_d12/NTU.json"
     solution_dir = "./results/v4_cbws/NTU/"
-    time_limit_init = 10
-    time_limit_unit = 10
+    time_limit_init = 15
+    time_limit_unit = 15
+
+    for i in range(len(sys.argv)):
+        if sys.argv[i] == '-i':
+            instance = sys.argv[i+1]
+        elif sys.argv[i] == '-o':
+            solution_dir = sys.argv[i+1]
+        elif sys.argv[i] == '-t':
+            time_limit = int(sys.argv[i+1])
+            time_limit_init = int(time_limit/2)
+            time_limit_unit = int(time_limit/2)
+
 
     rebalance_v4_cbws(instance, solution_dir, time_limit_init, time_limit_unit)
