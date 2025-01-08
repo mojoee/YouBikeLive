@@ -1,12 +1,8 @@
-import sqlite3
 import pandas as pd
 import numpy as np
-from geopy.distance import geodesic
 import json
 import os
-import matplotlib.pyplot as plt
-from DBIO import load_and_preprocess_station, fetch_stations, \
-                get_station_available_bikes_at_time
+from DBIO import YouBikeDataManager
 from config import cfg
 from demand_prediction import DemandPredictionContext, NaiveDemandPredictionStrategy, ProphetDemandPredictionStrategy
 
@@ -14,6 +10,7 @@ from demand_prediction import DemandPredictionContext, NaiveDemandPredictionStra
 # Configuration
 # ---------------------------------------
 db_path = "./youbike_data.db"
+data_manager = YouBikeDataManager(db_path)
 time_of_interest_start = cfg.instance_time_start
 time_of_interest_end = cfg.instance_time_end
 output_dir = "./data/instances"
@@ -33,9 +30,9 @@ default_station = {
 }
 
 if cfg.prediction_strategy == "prophet":
-    context = DemandPredictionContext(ProphetDemandPredictionStrategy())
+    context = DemandPredictionContext(ProphetDemandPredictionStrategy(data_manager))
 elif cfg.prediction_strategy == "naive":
-    context = DemandPredictionContext(NaiveDemandPredictionStrategy())
+    context = DemandPredictionContext(NaiveDemandPredictionStrategy(data_manager))
 else:
     raise ValueError(f"Invalid prediction strategy: {cfg.prediction_strategy}")
 
@@ -86,16 +83,16 @@ for i, sno in enumerate(df_distances.columns):
         surr.append(distance)
     distance_matrix.append(surr)
 
-df_stations = fetch_stations(db_path)
+df_stations = data_manager.fetch_stations()
 optimal_allocation = {}
 for sno in df_distances.columns:
-    hourly_demands = context.predict_demand(station_id=sno)
+    hourly_demands = context.predict_demand(station_id=sno, forecast_date=cfg.instance_start)
     cap = get_station_capacity(df_stations, sno)
     s_goal = find_optimal_starting_point(hourly_demands, cap)
     # get intial
     # we need to calculate the 8 hour interval wich is best for rebalancing
     # assuming that we rebalance from 00:00 to 08:00
-    s_init = get_station_available_bikes_at_time(sno, cfg.instance_start)
+    s_init = data_manager.get_station_available_bikes_at_time(sno, cfg.instance_start)
 
     optimal_allocation[sno] = (s_init, s_goal)
 
@@ -140,7 +137,7 @@ instance = {
     }
 }
 
-name = f"instance1_{cfg.instance_start}"
+name = f"instance_{cfg.prediction_strategy}_{cfg.instance_start}"
 output_file = f"{output_dir}/instance_forecast_{name}.json"
 with open(output_file, "w") as f:
     json.dump(instance, f, cls=NumpyEncoder, indent=4)
