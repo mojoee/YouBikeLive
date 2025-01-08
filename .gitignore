@@ -18,3 +18,7 @@ results/optimization
 youbike_data.db
 *.h5
 *.json
+
+
+# Allow JSON files in data/instances folder
+!data/instances/*.json
