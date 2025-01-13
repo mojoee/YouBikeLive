@@ -6,11 +6,35 @@ import urllib.request
 import json
 import os
 
+# Weather stations with their coordinates
+weather_stations_data = [
+    ("Anpu", 121.5297306, 25.18258611),
+    ("Taipei", 121.514853, 25.037658),
+    ("Yangmingshan", 121.5445472, 25.16207778),
+    ("NTU", 121.539416, 25.014278),
+    ("PCCU", 121.53987, 25.13605),
+    ("Science Education Center", 121.516506, 25.096356),
+    ("Shezi", 121.469681, 25.109508),
+    ("Tianmu", 121.537169, 25.117494),
+    ("Neihu", 121.57545, 25.079422),
+    ("Datunshan", 121.522408, 25.175675),
+    ("Xinyi", 121.564597, 25.037822),
+    ("Wenshan", 121.575728, 25.00235),
+    ("Pingdeng", 121.577086, 25.129142),
+    ("Songshan", 121.550428, 25.048711),
+    ("Shipai", 121.513139, 25.115597),
+    ("Freeway No. 3 - CCTV – S016K", 121.6158, 25.03306),
+    ("Freeway No. 3 - CCTV – A005K", 121.5975, 25.00194),
+    ("Da'an Forest Park", 121.53628, 25.02955),
+    ("Agriculture Guandu Station", 121.492, 25.11575),
+]
+
 
 class YouBikeDataManager:
     def __init__(self, db_path):
         self.db_path = db_path
         self.conn = None
+        self.connect()
 
     def connect(self):
         if self.conn is None:
@@ -22,7 +46,6 @@ class YouBikeDataManager:
             self.conn = None
 
     def fetch_stations(self):
-        self.connect()
         query = """
         SELECT 
             youbike_stations.sno, 
@@ -40,8 +63,25 @@ class YouBikeDataManager:
         df = pd.read_sql_query(query, self.conn)
         return df
 
+    def fetch_all_stations(self):
+        # Query to fetch bike stations
+        bike_stations_query = """
+        SELECT sno AS station_id, sna AS name, latitude, longitude
+        FROM youbike_stations;
+        """
+        bike_stations = pd.read_sql_query(bike_stations_query, self.conn)
+
+        # Query to fetch weather stations
+        weather_stations_query = """
+        SELECT name AS station_name, latitude, longitude
+        FROM weather_stations;
+        """
+        weather_stations = pd.read_sql_query(weather_stations_query, self.conn)
+
+        return bike_stations, weather_stations
+
+
     def load_and_preprocess_station(self, station_id):
-        self.connect()
         query = f"""
         SELECT available_rent_bikes, mday, available_return_bikes
         FROM youbike_status
@@ -99,3 +139,36 @@ class YouBikeDataManager:
         response = urllib.request.urlopen(url)
         data = json.loads(response.read())
         return data
+
+    # Create and populate the weather_stations table
+    def create_and_populate_weather_stations(self):
+        cursor = self.conn.cursor()
+
+        # Create the table if it doesn't exist
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS weather_stations (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            latitude REAL NOT NULL,
+            longitude REAL NOT NULL
+        );
+        """
+        )
+
+        # Insert data into the table
+        cursor.executemany(
+            "INSERT INTO weather_stations (name, longitude, latitude) VALUES (?, ?, ?);",
+            weather_stations_data
+        )
+
+        self.conn.commit()
+        self.conn.close()
+        print("Weather stations table created and populated.")
+
+
+if __name__ == "__main__":
+    db_path = 'youbike_data.db'
+    data_manager = YouBikeDataManager(db_path)
+    data_manager.create_and_populate_weather_stations()
+    data_manager.close()
+    print("Weather stations table created and populated.")
