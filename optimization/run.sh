@@ -1,5 +1,5 @@
 INSTANCE=./data/instances_v4/v12-24-24_b8h_uniform_goal.json
-TIMEOUT=30
+TIMEOUT=3600
 
 OUTPUT=./results/v4/
 python3 ./optimization/models/rebalance_v4.py -i $INSTANCE -o $OUTPUT -t $TIMEOUT
