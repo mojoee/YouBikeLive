@@ -10,5 +10,8 @@ TIMEOUT=3600
 # OUTPUT=./results/v4_cb/
 # python3 ./optimization/models/rebalance_unit.py -i $INSTANCE -o $OUTPUT -t $TIMEOUT -f v4_cb
 
-OUTPUT=./results/v4_cbws/
-python3 ./optimization/models/rebalance_v4_cbws.py -i $INSTANCE -o $OUTPUT -t $TIMEOUT
+# OUTPUT=./results/v4_cbws/
+# python3 ./optimization/models/rebalance_v4_cbws.py -i $INSTANCE -o $OUTPUT -t $TIMEOUT
+
+OUTPUT=./results/v5/
+python3 ./optimization/models/rebalance_v5.py -i $INSTANCE -o $OUTPUT -t $TIMEOUT
