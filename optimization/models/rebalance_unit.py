@@ -87,9 +87,9 @@ def rebalance_unit(instance_path, solution_path, time_limit, remove, rebalancing
 
 if __name__ == "__main__":
     # PARAMETERS
-    instance_path = "./data/instances_v4/v12-24-24_b8h_d12/NTU.json"
-    solution_dir = "./results/v4_cb/v12-24-24_b8h_d12/NTU/"
-    time_limit = 10
+    instance_path = "./data/instances_v4/24-12-28.json"
+    solution_dir = "./results/v4_cb/"
+    time_limit = 30
     remove = False
     function_label = "v4_cb"
 

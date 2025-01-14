@@ -1,8 +1,0 @@
-instance_cb already exists: ./data/instances_v4/v12-24-24_b8h_uniform_goal_cb.json
-solution_cb already exists: ./results/v4_cbws/v12-24-24_b8h_uniform_goal_init_cb.json
-Unit solution processed, exported ./results/v4_cbws/v12-24-24_b8h_uniform_goal_init.json
-Map saved as './results/v4_cbws/v12-24-24_b8h_uniform_goal_init.html'
-instance_unit already exists: ./data/instances_v4/v12-24-24_b8h_uniform_goal_unit.json
-solution_unit already exists: ./results/v4_cbws/v12-24-24_b8h_uniform_goal_unit.json
-Unit solution processed, exported ./results/v4_cbws/v12-24-24_b8h_uniform_goal.json
-Map saved as './results/v4_cbws/v12-24-24_b8h_uniform_goal.html'
