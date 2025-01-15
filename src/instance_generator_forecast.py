@@ -58,6 +58,38 @@ def find_optimal_starting_point(hourly_demands, station_capacity):
     return int(s_goal)
 
 
+def simulate_inventory(hourly_demands, station_capacity, starting_inventory):
+    overflow_count = 0
+    shortage_count = 0
+    inventory = starting_inventory
+
+    for demand in hourly_demands:
+        # Update inventory
+        inventory = max(0, min(station_capacity, inventory - demand))
+
+        # Check overflow and shortage
+        if inventory == station_capacity:
+            overflow_count += 1
+        elif inventory == 0:
+            shortage_count += 1
+
+    return overflow_count, shortage_count
+
+def find_optimal_starting_point_2(hourly_demands, station_capacity, w_overflow=1, w_shortage=1):
+    best_inventory = 0
+    best_loss = float('inf')
+
+    for inventory in range(station_capacity + 1):
+        overflow_count, shortage_count = simulate_inventory(hourly_demands, station_capacity, inventory)
+        loss = w_overflow * overflow_count + w_shortage * shortage_count
+
+        if loss < best_loss:
+            best_loss = loss
+            best_inventory = inventory
+
+    return best_inventory, best_loss
+
+
 def get_station_capacity(df, sno, default_capacity=10):
     matching_rows = df.loc[df["sno"] == sno]
     if not matching_rows.empty:
@@ -85,14 +117,25 @@ for i, sno in enumerate(df_distances.columns):
 
 df_stations = data_manager.fetch_stations()
 optimal_allocation = {}
+total_bikes = sum([data_manager.get_station_available_bikes_at_time(sno, cfg.instance_start) for sno in df_distances.columns])
+total_capacity = sum([get_station_capacity(df_stations, sno) for sno in df_distances.columns])
 for sno in df_distances.columns:
     hourly_demands = context.predict_demand(station_id=sno, forecast_date=cfg.instance_start)
     cap = get_station_capacity(df_stations, sno)
-    s_goal = find_optimal_starting_point(hourly_demands, cap)
+    s_init = data_manager.get_station_available_bikes_at_time(sno, cfg.instance_start)
+    if cfg.inventory_strategy == "peak":
+        s_goal = find_optimal_starting_point(hourly_demands, cap)
+    elif cfg.inventory_strategy == "duration":
+        s_goal, _ = find_optimal_starting_point_2(hourly_demands, cap)
+    elif cfg.inventory_strategy == "nochange":
+        s_goal = s_init
+    elif cfg.inventory_strategy == "proportional":
+        s_goal = int((cap / total_capacity) * total_bikes)
+    else:
+        print(f"Invalid inventory strategy: {cfg.inventory_strategy}")
     # get intial
     # we need to calculate the 8 hour interval wich is best for rebalancing
     # assuming that we rebalance from 00:00 to 08:00
-    s_init = data_manager.get_station_available_bikes_at_time(sno, cfg.instance_start)
 
     optimal_allocation[sno] = (s_init, s_goal)
 
@@ -137,7 +180,7 @@ instance = {
     }
 }
 
-name = f"instance_{cfg.prediction_strategy}_{cfg.instance_start}"
+name = f"instance_{cfg.prediction_strategy}_{cfg.instance_start}_{cfg.inventory_strategy}"
 output_file = f"{output_dir}/instance_forecast_{name}.json"
 with open(output_file, "w") as f:
     json.dump(instance, f, cls=NumpyEncoder, indent=4)
