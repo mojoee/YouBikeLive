@@ -53,11 +53,13 @@ def rebalance_v4(instance_path, solution_path, time_limit, routes_init=None):
     loading_time = data["constants"]["loading_time"]
     max_trip_duration = data["constants"]["max_trip_duration"]
 
+    abs_demands_total = sum([abs(d) for d in demands_data])
+
     print("Solving", instance_path)
     print("stations_cnt:", stations_cnt)
     print("demand_min:", min(demands_data))
     print("demand_max:", max(demands_data))
-    print("abs_demands_total:", sum([abs(d) for d in demands_data]))
+    print("abs_demands_total:", abs_demands_total)
     # print("demands", demands_data)
     print("vehicles_cnt:", vehicles_cnt)
     print("vehicles_capacities:", vehicles_capacities)
@@ -168,6 +170,7 @@ def rebalance_v4(instance_path, solution_path, time_limit, routes_init=None):
 
         result["instance"] = instance_path
         result["time_limit"] = optimizer.param.time_limit
+        result["abs_demands_total"] = abs_demands_total
         result["running_time"] = optimizer.get_statistics().get_running_time()
         result["status"] = str(sol.get_status()).replace('HxSolutionStatus.', '')
         result["objectives"] = [

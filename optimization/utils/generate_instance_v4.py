@@ -4,8 +4,8 @@ import json
 import numpy as np
 import math
 
-base_instance_path = "./data/instances_v4/instance_forecast_test_2024-12-28 00_00_01.json"
-output_path = "./data/instances_v4/24-12-28.json"
+base_instance_path = "./data/instances/instance_forecast_instance_naive_2024-12-28 00:00:01_duration.json"
+output_path = "./data/instances_v4/naive_21/demo.json"
 
 
 instance = {}
