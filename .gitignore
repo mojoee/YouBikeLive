@@ -10,4 +10,15 @@ results/optimization
 *.db
 *.log
 *.pyc
+*.db
+*.sql
+*.zip
+*.csv
+*.deb
+youbike_data.db
+*.h5
+*.json
 
+
+# Allow JSON files in data/instances folder
+!data/instances/*.json

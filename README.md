@@ -116,6 +116,12 @@ This section should list any major frameworks/libraries used to bootstrap your p
 
 You can easily download the project and host it locally.
 
+### Usage
+
+use the instance_generator_forecast.py to create instances with real-world data and forecasted demands
+
+you can then solve the instances with our mathematical solver
+
 ### Prerequisites
 
 If you want to host it locally, you need the following:
@@ -149,6 +155,7 @@ You can reach the web-hosted page [here](https://youbikelive-1997a5b6ef93.heroku
 - [x] Populate the two new tables with all the data
 - [ ] Figure out a way to calculate the demand
 - [x] Add scraping for the weather DB
+- [ ] checkout Nikos API
 
 See the [open issues](https://github.com/mojoee/YouBikeLive/issues) for a full list of proposed features (and known issues).
 

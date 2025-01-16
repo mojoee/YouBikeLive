@@ -28,7 +28,8 @@ def fetch_stations(time_of_interest):
     )
     SELECT 
         sno, 
-        snaen, 
+        snaen,
+        sareaen, 
         latitude, 
         longitude, 
         capacity, 
@@ -98,6 +99,7 @@ for idx, row in df.iterrows():
         "id": idx,
         "true_id": row['sno'],
         "station name": row['snaen'],
+        "district": row['sareaen'],
         "capacity": row['capacity'],
         "s_init": row['s_init'],
         "s_goal": row['s_goal'],
