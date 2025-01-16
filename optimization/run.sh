@@ -1,5 +1,5 @@
 INSTANCE=./data/instances_v4/v12-24-24_b8h_uniform_goal.json
-TIMEOUT=7200
+TIMEOUT=3600
 
 # OUTPUT=./results/v4/
 # python3 ./optimization/models/rebalance_v4.py -i $INSTANCE -o $OUTPUT -t $TIMEOUT
@@ -10,8 +10,8 @@ TIMEOUT=7200
 # OUTPUT=./results/v4_cb/
 # python3 ./optimization/models/rebalance_unit.py -i $INSTANCE -o $OUTPUT -t $TIMEOUT -f v4_cb
 
-OUTPUT=./results/v4_cbws/
-python3 ./optimization/models/rebalance_v4_cbws.py -i $INSTANCE -o $OUTPUT -t $TIMEOUT
+# OUTPUT=./results/v4_cbws/
+# python3 ./optimization/models/rebalance_v4_cbws.py -i $INSTANCE -o $OUTPUT -t $TIMEOUT
 
-# OUTPUT=./results/v5/
-# python3 ./optimization/models/rebalance_v5.py -i $INSTANCE -o $OUTPUT -t $TIMEOUT
+OUTPUT=./results/v5_1/
+python3 ./optimization/models/rebalance_v5.py -i $INSTANCE -o $OUTPUT -t $TIMEOUT
