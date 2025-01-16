@@ -214,7 +214,7 @@ if __name__ == "__main__":
 
     # Redirect stdout to log file
     problem_name = instance_path.split("/")[-1].replace(".json", "")
-    log_file_path = solution_dir + problem_name + ".log"
+    log_file_path = solution_dir + problem_name + ".txt"
     log_file = open(log_file_path, 'w')
     sys.stdout = Tee(sys.stdout, log_file)
     sys.stderr = Tee(sys.stderr, log_file)
