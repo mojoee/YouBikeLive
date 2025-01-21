@@ -18,7 +18,7 @@ from rebalance_v1_2 import rebalance_v1_2
 from rebalance_v1_2_minmax import rebalance_v1_2_minmax
 from rebalance_v2_1_minmax import rebalance_v2_1_minmax
 from rebalance_v3_1_minmax import rebalance_v3_1_minmax
-from rebalance_v4 import rebalance_v4
+from rebalance_v4 import rebalance_v4, rebalance_v4_total
 
 rebalancing_map = {
     "v1_1": rebalance_v1_1,
@@ -27,7 +27,8 @@ rebalancing_map = {
     "v2_1_minmax": rebalance_v2_1_minmax,
     "v3_1_minmax": rebalance_v3_1_minmax,
     "v4": rebalance_v4, 
-    "v4_cb": rebalance_v4
+    "v4_cb": rebalance_v4, 
+    "v4_cb_total": rebalance_v4_total
 }
 
 unit_instance_generator_map = {
@@ -37,7 +38,8 @@ unit_instance_generator_map = {
     "v2_1_minmax": generate_unit_instance_v2,
     "v3_1_minmax":generate_unit_instance_v3,
     "v4": generate_unit_instance_v4, 
-    "v4_cb": generate_cb_instance
+    "v4_cb": generate_cb_instance,
+    "v4_cb_total": generate_cb_instance
 }
 
 suffix_map = {
@@ -47,7 +49,8 @@ suffix_map = {
     "v2_1_minmax": "_unit.json",
     "v3_1_minmax": "_unit.json",
     "v4": "_unit.json",
-    "v4_cb": "_cb.json"
+    "v4_cb": "_cb.json",
+    "v4_cb_total": "_cb.json"
 }
 
 
@@ -87,11 +90,12 @@ def rebalance_unit(instance_path, solution_path, time_limit, remove, rebalancing
 
 if __name__ == "__main__":
     # PARAMETERS
-    instance_path = "./data/instances_v4/24-12-28.json"
-    solution_dir = "./results/v4_cb/"
-    time_limit = 30
+    instance_path = "./data/instances_v4/v12-24-24_b8h_uniform_goal.json"
+    # instance_path = "./data/instances_v4/v12-24-24_b8h_d12/NTU.json"
+    solution_dir = "./results/v4_cb_total/"
+    time_limit = 3600
     remove = False
-    function_label = "v4_cb"
+    function_label = "v4_cb_total"
 
     for i in range(len(sys.argv)):
         if sys.argv[i] == '-i':
@@ -111,7 +115,7 @@ if __name__ == "__main__":
 
     # Redirect stdout to log file
     problem_name = instance_path.split("/")[-1].replace(".json", "")
-    log_file_path = solution_dir + problem_name + ".log"
+    log_file_path = solution_dir + problem_name + ".txt"
     log_file = open(log_file_path, 'w')
     sys.stdout = Tee(sys.stdout, log_file)
     sys.stderr = Tee(sys.stderr, log_file)

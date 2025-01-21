@@ -3,7 +3,10 @@
 import re
 import matplotlib.pyplot as plt
 
-logfile = "./results/v4_cb/v12-24-24_b8h_uniform_goal.txt"
+logfile = "./results/v4_cbws/v12-24-24_b8h_uniform_goal.txt"
+LB = int(20136 / 60)
+
+
 
 # Initialize lists to store the data
 times = []
@@ -20,11 +23,22 @@ with open(logfile, 'r') as file:
             time = int(words[1])
             obj1 = int(words[6])
             obj2 = int(words[8]) / 60
+            if obj1 == 0 and obj2 == 0:
+                continue
             times.append(time)
             obj1_values.append(obj1)
             obj2_values.append(obj2)
         if len(words) > 1 and words[0] == 'abs_demands_total:':
             abs_demands_total = int(words[1])
+
+# Reindex times if restarting
+t_max = max(times)
+shift = False
+for i in range(1, len(times)):
+    if times[i] < times[i - 1]:
+        shift = True
+    if shift:
+        times[i] += t_max        
 
 # Create the plot with a specific size
 fig, ax1 = plt.subplots(figsize=(8, 6))  # Set the plot size to 8 inches by 6 inches
@@ -47,19 +61,26 @@ ax2.tick_params(axis='y', labelcolor='tab:red')
 # Add grid to the second y-axis
 ax2.grid(True)
 
+# Combine the line objects from both axes
+lines = [line1, line2]
+
 # Plot first occurrence of the abs_demands_total and annotate the value of t
 for t, obj1 in zip(times, obj1_values):
     if obj1 == abs_demands_total:
-        vline = ax1.axvline(x=t, color='black', linestyle='--', label='All relocations planned', zorder=3)
-        ax1.annotate(f't={t} sec', xy=(t, ax1.get_ylim()[1]), xytext=(t + 50, ax1.get_ylim()[1] * 0.5), horizontalalignment='left')
+        vline1 = ax1.axvline(x=t, color='tab:blue', linestyle='--', label=f'All relocations planned (t={t} sec)', zorder=3)
+        lines.append(vline1)
+        # y_coord = ax1.get_ylim()[0] + (ax1.get_ylim()[1] - ax1.get_ylim()[0]) / 2
+        # ax1.annotate(f't={t} sec', xy=(t, y_coord), xytext=(t + 50, y_coord), horizontalalignment='left')
         break
 
-# Combine the line objects from both axes
-lines = [line1, line2, vline]
-labels = [line.get_label() for line in lines]
+# Plot the lower bound
+if LB > 0:
+    vline2 = ax2.axhline(y=LB, color='tab:red', linestyle='--', label=f'Makespan lower bound (t={LB} min)', zorder=1)
+    lines.append(vline2)
 
 # Add legends
-ax1.legend(lines, labels, loc='lower right')
+labels = [line.get_label() for line in lines]
+ax1.legend(lines, labels, loc='right')
 
 # Add a title
 plt.title('Objectives convergence over time')
