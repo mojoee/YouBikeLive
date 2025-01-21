@@ -188,7 +188,18 @@ def rebalance_v4(instance_path, solution_path, time_limit, routes_init=None):
                                      "duration": routes_costs[k].value, 
                                      "route": route,
                                      "leaving_load": leaving_load})        
+        
+        # Output s_goals
+        result["s_goals"] = [station["s_goal"] for station in data["stations"]]
+        result["s_goals_real"] = [station["s_init"] for station in data["stations"]]
+        for route in result["routes"]:
+            for i in range(len(route["route"])):
+                station_id = route["route"][i]
+                result["s_goals_real"][station_id] += demands_data[station_id]
+    
         result_string = json.dumps(result, indent=4)
+
+
 
         with open(solution_path, "w") as outfile:
             outfile.write(result_string)
@@ -381,8 +392,8 @@ def rebalance_v4_total(instance_path, solution_path, time_limit, routes_init=Non
 if __name__ == "__main__":
     # DEFAULT PARAMETERS
     instance_path = "./data/instances_v4/v12-24-24_b8h_d12/NTU.json"
-    solution_dir = "./results/v4_total/v12-24-24_b8h_d12/"
-    time_limit = 30
+    solution_dir = "./results/v4/v12-24-24_b8h_d12/"
+    time_limit = 5
 
     for i in range(len(sys.argv)):
         if sys.argv[i] == '-i':
