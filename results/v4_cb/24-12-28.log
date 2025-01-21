@@ -1,0 +1,133 @@
+Generating unit instance: ./data/instances_v4/24-12-28_cb.json  . . . 
+Generated stations_new
+Generated distances_new
+Generated depot_new
+data_new prepared
+Exported instance ./data/instances_v4/24-12-28_cb.json
+Solving ./data/instances_v4/24-12-28_cb.json
+stations_cnt: 1665
+demand_min: -12
+demand_max: 12
+abs_demands_total: 10336
+vehicles_cnt: 39
+vehicles_capacities: [12, 24, 24, 12, 24, 24, 12, 24, 24, 12, 24, 24, 12, 24, 24, 12, 24, 24, 12, 24, 24, 12, 24, 24, 12, 24, 24, 12, 24, 24, 12, 24, 24, 12, 24, 24, 12, 24, 24]
+vehicles_depots [0, 0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6, 7, 7, 7, 8, 8, 8, 9, 9, 9, 10, 10, 10, 11, 11, 11, 12, 12, 12]
+depots_cnt: 13
+parking_time: 180
+loading_time: 60
+max_trip_duration: 28800
+
+Preprocess model 0%
+Preprocess model 1%
+Preprocess model 1%
+Preprocess model 2%
+Preprocess model 2%
+Preprocess model 3%
+Preprocess model 3%
+Preprocess model 4%
+Preprocess model 4%
+Preprocess model 5%
+Preprocess model 5%
+Preprocess model 6%
+Preprocess model 7%
+Preprocess model 7%
+Preprocess model 8%
+Preprocess model 8%
+Preprocess model 9%
+Preprocess model 9%
+Preprocess model 10%
+Preprocess model 10%
+Preprocess model 11%
+Preprocess model 12%
+Preprocess model 12%
+Preprocess model 13%
+Preprocess model 13%
+Preprocess model 14%
+Preprocess model 14%
+Preprocess model 14%
+Preprocess model 29%
+Preprocess model 43%
+Preprocess model 57%
+Preprocess model 71%
+Preprocess model 86%
+Preprocess model 87%
+Preprocess model 88%
+Preprocess model 89%
+Preprocess model 90%
+Preprocess model 92%
+Preprocess model 93%
+Preprocess model 94%
+Preprocess model 95%
+Preprocess model 96%
+Preprocess model 98%
+Preprocess model 99%
+Preprocess model 100%
+Preprocess model 100%
+Preprocess model 100%
+Initialize solver 0%
+Initialize solver 17%
+Initialize solver 33%
+Initialize solver 50%
+Initialize solver 67%
+Initialize solver 83%
+Initialize solver 92%
+Initialize solver 100%
+Initialize solver 100%
+Initialize solver 100%
+Push initial solution 0%
+Push initial solution 50%
+Push initial solution 100%
+Push initial solution 100%
+
+Model:  expressions = 6593, decisions = 39, constraints = 118, objectives = 2
+Param:  time limit = 30 sec, no iteration limit
+
+[objective directions]:     maximize |     minimize
+
+[  0 sec,       0 itr]:            0 |            0
+[ optimality gaps    ]:      100.00% |           0%
+[  1 sec,   29242 itr]:         5179 |        28735
+[  2 sec,   64468 itr]:         6558 |        28800
+[  3 sec,   96563 itr]:         6931 |        28793
+[  4 sec,  128868 itr]:         7207 |        28769
+[  5 sec,  167821 itr]:         7435 |        28793
+[  6 sec,  208844 itr]:         7633 |        28786
+[  7 sec,  242864 itr]:         7747 |        28800
+[  8 sec,  271173 itr]:         7815 |        28799
+[  9 sec,  295255 itr]:         7867 |        28785
+[ 10 sec,  332473 itr]:         7969 |        28796
+[ optimality gaps    ]:       98.98% |      100.00%
+[ 11 sec,  373325 itr]:         8049 |        28799
+[ 12 sec,  414396 itr]:         8126 |        28800
+[ 13 sec,  446292 itr]:         8179 |        28784
+[ 14 sec,  476551 itr]:         8212 |        28775
+[ 15 sec,  514804 itr]:         8273 |        28798
+[ 16 sec,  541253 itr]:         8298 |        28797
+[ 17 sec,  565986 itr]:         8334 |        28797
+[ 18 sec,  594942 itr]:         8377 |        28796
+[ 19 sec,  624241 itr]:         8412 |        28797
+[ 20 sec,  653302 itr]:         8444 |        28796
+[ optimality gaps    ]:       98.92% |      100.00%
+[ 21 sec,  686298 itr]:         8487 |        28791
+[ 22 sec,  729567 itr]:         8535 |        28799
+[ 23 sec,  766028 itr]:         8567 |        28799
+[ 24 sec,  794443 itr]:         8598 |        28793
+[ 25 sec,  829616 itr]:         8632 |        28798
+[ 26 sec,  867001 itr]:         8651 |        28799
+[ 27 sec,  908891 itr]:         8698 |        28798
+[ 28 sec,  950609 itr]:         8725 |        28777
+[ 29 sec,  990567 itr]:         8747 |        28799
+[ 30 sec, 1032365 itr]:         8778 |        28796
+[ optimality gaps    ]:       98.87% |      100.00%
+[ 30 sec, 1032365 itr]:         8778 |        28796
+[ optimality gaps    ]:       98.87% |      100.00%
+
+1032365 iterations performed in 30 seconds
+
+Feasible solution: 
+  obj    =         8778 |        28796
+  gap    =       98.87% |      100.00%
+  bounds =       779220 |            0
+Solution exported to ./results/v4_cb/24-12-28_cb.json
+Unit solution processed, exported ./results/v4_cb/24-12-28.json
+Map saved as './results/v4_cb/24-12-28.html'

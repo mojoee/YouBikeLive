@@ -88,53 +88,27 @@ Push initial solution 100%
 Push initial solution 100%
 
 Model:  expressions = 656, decisions = 3, constraints = 10, objectives = 2
-Param:  time limit = 30 sec, no iteration limit
+Param:  time limit = 5 sec, no iteration limit
 
 [objective directions]:     maximize |     minimize
 
 [  0 sec,       0 itr]:            0 |            0
 [ optimality gaps    ]:      100.00% |           0%
-[  1 sec,   16800 itr]:          672 |        26820
-[  2 sec,   37186 itr]:          672 |        18949
-[  3 sec,   71357 itr]:          672 |        18939
-[  4 sec,  103283 itr]:          672 |        18939
-[  5 sec,  138012 itr]:          672 |        18939
-[  6 sec,  171339 itr]:          672 |        18939
-[  7 sec,  202281 itr]:          672 |        18939
-[  8 sec,  232836 itr]:          672 |        18939
-[  9 sec,  254736 itr]:          672 |        18939
-[ 10 sec,  293756 itr]:          672 |        18868
-[ optimality gaps    ]:       84.55% |      100.00%
-[ 11 sec,  324290 itr]:          672 |        18829
-[ 12 sec,  358411 itr]:          672 |        18829
-[ 13 sec,  391696 itr]:          672 |        18828
-[ 14 sec,  425646 itr]:          672 |        18828
-[ 15 sec,  449008 itr]:          672 |        18828
-[ 16 sec,  471133 itr]:          672 |        18828
-[ 17 sec,  493510 itr]:          672 |        18828
-[ 18 sec,  521828 itr]:          672 |        18828
-[ 19 sec,  548117 itr]:          672 |        18828
-[ 20 sec,  570520 itr]:          672 |        18828
-[ optimality gaps    ]:       84.55% |      100.00%
-[ 21 sec,  590147 itr]:          672 |        18825
-[ 22 sec,  611822 itr]:          672 |        18825
-[ 23 sec,  637918 itr]:          672 |        18825
-[ 24 sec,  657442 itr]:          672 |        18825
-[ 25 sec,  681704 itr]:          672 |        18825
-[ 26 sec,  705872 itr]:          672 |        18825
-[ 27 sec,  733647 itr]:          672 |        18825
-[ 28 sec,  756988 itr]:          672 |        18825
-[ 29 sec,  782718 itr]:          672 |        18825
-[ 30 sec,  805528 itr]:          672 |        18825
-[ optimality gaps    ]:       84.55% |      100.00%
-[ 30 sec,  805528 itr]:          672 |        18825
+[  1 sec,   27816 itr]:          672 |        19060
+[  2 sec,   67102 itr]:          672 |        18939
+[  3 sec,   92193 itr]:          672 |        18939
+[  4 sec,  132713 itr]:          672 |        18939
+[  5 sec,  188702 itr]:          672 |        18939
+[  5 sec,  188702 itr]:          672 |        18939
 [ optimality gaps    ]:       84.55% |      100.00%
 
-805528 iterations performed in 30 seconds
+188702 iterations performed in 5 seconds
 
 Feasible solution: 
-  obj    =          672 |        18825
+  obj    =          672 |        18939
   gap    =       84.55% |      100.00%
   bounds =         4350 |            0
+[25, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0]
+[0, 25, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0]
 Solution exported to ./results/v4_total/v12-24-24_b8h_d12/NTU.json
 Map saved as './results/v4_total/v12-24-24_b8h_d12/NTU.html'

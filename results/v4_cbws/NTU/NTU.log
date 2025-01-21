@@ -1,0 +1,235 @@
+Generated stations_new
+Generated distances_new
+Generated depot_new
+data_new prepared
+Exported instance ./data/instances_v4/v12-24-24_b8h_d12/NTU_cb.json
+Solving ./data/instances_v4/v12-24-24_b8h_d12/NTU_cb.json
+stations_cnt: 62
+demand_min: -12
+demand_max: 12
+abs_demands_total: 722
+vehicles_cnt: 3
+vehicles_capacities: [12, 24, 24]
+vehicles_depots [0, 0, 0]
+depots_cnt: 1
+parking_time: 180
+loading_time: 60
+max_trip_duration: 28800
+
+Preprocess model 0%
+Preprocess model 1%
+Preprocess model 1%
+Preprocess model 2%
+Preprocess model 2%
+Preprocess model 3%
+Preprocess model 3%
+Preprocess model 4%
+Preprocess model 4%
+Preprocess model 5%
+Preprocess model 5%
+Preprocess model 6%
+Preprocess model 7%
+Preprocess model 7%
+Preprocess model 8%
+Preprocess model 8%
+Preprocess model 9%
+Preprocess model 9%
+Preprocess model 10%
+Preprocess model 10%
+Preprocess model 11%
+Preprocess model 12%
+Preprocess model 12%
+Preprocess model 13%
+Preprocess model 13%
+Preprocess model 14%
+Preprocess model 14%
+Preprocess model 14%
+Preprocess model 29%
+Preprocess model 43%
+Preprocess model 44%
+Preprocess model 44%
+Preprocess model 45%
+Preprocess model 46%
+Preprocess model 47%
+Preprocess model 48%
+Preprocess model 48%
+Preprocess model 49%
+Preprocess model 50%
+Preprocess model 51%
+Preprocess model 52%
+Preprocess model 52%
+Preprocess model 53%
+Preprocess model 54%
+Preprocess model 57%
+Preprocess model 71%
+Preprocess model 86%
+Preprocess model 87%
+Preprocess model 88%
+Preprocess model 89%
+Preprocess model 90%
+Preprocess model 92%
+Preprocess model 93%
+Preprocess model 94%
+Preprocess model 95%
+Preprocess model 96%
+Preprocess model 98%
+Preprocess model 99%
+Preprocess model 100%
+Preprocess model 100%
+Preprocess model 100%
+Initialize solver 0%
+Initialize solver 17%
+Initialize solver 33%
+Initialize solver 50%
+Initialize solver 67%
+Initialize solver 83%
+Initialize solver 92%
+Initialize solver 100%
+Initialize solver 100%
+Initialize solver 100%
+Push initial solution 0%
+Push initial solution 50%
+Push initial solution 100%
+Push initial solution 100%
+
+Model:  expressions = 660, decisions = 3, constraints = 10, objectives = 2
+Param:  time limit = 10 sec, no iteration limit
+
+[objective directions]:     maximize |     minimize
+
+[  0 sec,       0 itr]:            0 |            0
+[ optimality gaps    ]:      100.00% |           0%
+[  1 sec,   10240 itr]:          685 |        28310
+[  2 sec,   74258 itr]:          722 |        19617
+[  3 sec,  111899 itr]:          722 |        19593
+[  4 sec,  161137 itr]:          722 |        19593
+[  5 sec,  206745 itr]:          722 |        19529
+[  6 sec,  243726 itr]:          722 |        19529
+[  7 sec,  283887 itr]:          722 |        19529
+[  8 sec,  338330 itr]:          722 |        19529
+[  9 sec,  377577 itr]:          722 |        19529
+[ 10 sec,  400216 itr]:          722 |        19529
+[ optimality gaps    ]:       67.65% |      100.00%
+[ 10 sec,  400216 itr]:          722 |        19529
+[ optimality gaps    ]:       67.65% |      100.00%
+
+400216 iterations performed in 10 seconds
+
+Feasible solution: 
+  obj    =          722 |        19529
+  gap    =       67.65% |      100.00%
+  bounds =         2232 |            0
+Solution exported to ./results/v4_cbws/NTU/NTU_init_cb.json
+Unit solution processed, exported ./results/v4_cbws/NTU/NTU_init.json
+Map saved as './results/v4_cbws/NTU/NTU_init.html'
+Generated stations_new
+Generated distances_new
+Generated depot_new
+data_new prepared
+Exported instance ./data/instances_v4/v12-24-24_b8h_d12/NTU_unit.json
+Solving ./data/instances_v4/v12-24-24_b8h_d12/NTU_unit.json
+stations_cnt: 722
+demand_min: -1
+demand_max: 1
+abs_demands_total: 722
+vehicles_cnt: 3
+vehicles_capacities: [12, 24, 24]
+vehicles_depots [0, 0, 0]
+depots_cnt: 1
+parking_time: 180
+loading_time: 60
+max_trip_duration: 28800
+
+Preprocess model 0%
+Preprocess model 1%
+Preprocess model 1%
+Preprocess model 2%
+Preprocess model 2%
+Preprocess model 3%
+Preprocess model 3%
+Preprocess model 4%
+Preprocess model 4%
+Preprocess model 5%
+Preprocess model 5%
+Preprocess model 6%
+Preprocess model 7%
+Preprocess model 7%
+Preprocess model 8%
+Preprocess model 8%
+Preprocess model 9%
+Preprocess model 9%
+Preprocess model 10%
+Preprocess model 10%
+Preprocess model 11%
+Preprocess model 12%
+Preprocess model 12%
+Preprocess model 13%
+Preprocess model 13%
+Preprocess model 14%
+Preprocess model 14%
+Preprocess model 14%
+Preprocess model 29%
+Preprocess model 43%
+Preprocess model 57%
+Preprocess model 71%
+Preprocess model 86%
+Preprocess model 87%
+Preprocess model 88%
+Preprocess model 89%
+Preprocess model 90%
+Preprocess model 92%
+Preprocess model 93%
+Preprocess model 94%
+Preprocess model 95%
+Preprocess model 96%
+Preprocess model 98%
+Preprocess model 99%
+Preprocess model 100%
+Preprocess model 100%
+Preprocess model 100%
+Setting initial solution
+Initialize solver 0%
+Initialize solver 17%
+Initialize solver 33%
+Initialize solver 50%
+Initialize solver 67%
+Initialize solver 83%
+Initialize solver 92%
+Initialize solver 100%
+Initialize solver 100%
+Initialize solver 100%
+Push initial solution 0%
+Push initial solution 50%
+Push initial solution 100%
+Push initial solution 100%
+
+Model:  expressions = 1320, decisions = 3, constraints = 10, objectives = 2
+Param:  time limit = 10 sec, no iteration limit
+
+[objective directions]:     maximize |     minimize
+
+[  0 sec,       0 itr]:          722 |        19529
+[ optimality gaps    ]:       66.67% |      100.00%
+[  1 sec,    1076 itr]:          722 |        19529
+[  2 sec,    6147 itr]:          722 |        19529
+[  3 sec,   10482 itr]:          722 |        19529
+[  4 sec,   14542 itr]:          722 |        19529
+[  5 sec,   18116 itr]:          722 |        19529
+[  6 sec,   22113 itr]:          722 |        19529
+[  7 sec,   27951 itr]:          722 |        19529
+[  8 sec,   33667 itr]:          722 |        19529
+[  9 sec,   38457 itr]:          722 |        19529
+[ 10 sec,   40876 itr]:          722 |        19529
+[ optimality gaps    ]:       66.67% |      100.00%
+[ 10 sec,   40876 itr]:          722 |        19529
+[ optimality gaps    ]:       66.67% |      100.00%
+
+40876 iterations performed in 10 seconds
+
+Feasible solution: 
+  obj    =          722 |        19529
+  gap    =       66.67% |      100.00%
+  bounds =         2166 |            0
+Solution exported to ./results/v4_cbws/NTU/NTU_unit.json
+Unit solution processed, exported ./results/v4_cbws/NTU/NTU.json
+Map saved as './results/v4_cbws/NTU/NTU.html'
