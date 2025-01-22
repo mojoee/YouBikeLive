@@ -16,7 +16,7 @@ from tee import Tee
 
 
 
-def rebalance_v4_cbws(instance, solution_dir, time_limit_init, time_limit_unit):
+def rebalance_v4_cbws(instance, solution_dir, time_limit_init, time_limit_unit, remove=False):
     os.makedirs(solution_dir, exist_ok=True)
 
     problem_name = instance.split("/")[-1].replace(".json", "")
@@ -63,6 +63,13 @@ def rebalance_v4_cbws(instance, solution_dir, time_limit_init, time_limit_unit):
     save_path = solution.replace('.json', '.html')
     visualize_solution(instance, solution, save_path)
 
+    # Clean mess
+    if remove:
+        os.remove(instance_cb)
+        os.remove(solution_cb)
+        os.remove(instance_unit)
+        os.remove(solution_unit)
+
 
 
 
@@ -71,6 +78,7 @@ if __name__ == "__main__":
     solution_dir = "./results/v4_cbws/NTU/"
     time_limit_init = 15
     time_limit_unit = 15
+    remove = False
 
     for i in range(len(sys.argv)):
         if sys.argv[i] == '-i':
@@ -81,6 +89,7 @@ if __name__ == "__main__":
             time_limit = int(sys.argv[i+1])
             time_limit_init = int(time_limit/2)
             time_limit_unit = int(time_limit/2)
+        elif sys.argv[i] == '-r':
+            remove = True
 
-
-    rebalance_v4_cbws(instance, solution_dir, time_limit_init, time_limit_unit)
+    rebalance_v4_cbws(instance, solution_dir, time_limit_init, time_limit_unit, remove)
