@@ -20,5 +20,8 @@ youbike_data.db
 *.json
 
 
-# Allow JSON files in data/instances folder
+# Allow JSON files in data/instances and results folder
 !data/instances/*.json
+
+!data/instances_v4/**/*
+!results/**/*
