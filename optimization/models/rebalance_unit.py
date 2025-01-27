@@ -90,12 +90,12 @@ def rebalance_unit(instance_path, solution_path, time_limit, remove, rebalancing
 
 if __name__ == "__main__":
     # PARAMETERS
-    instance_path = "./data/instances_v4/v12-24-24_b8h_uniform_goal.json"
+    instance_path = "./data/instances_v4/naive_21/naive_2024-12-28_proportional.json"
     # instance_path = "./data/instances_v4/v12-24-24_b8h_d12/NTU.json"
-    solution_dir = "./results/v4_cb_total/"
+    solution_dir = "./results/v4_cb/"
     time_limit = 3600
-    remove = False
-    function_label = "v4_cb_total"
+    remove = True
+    function_label = "v4_cb"
 
     for i in range(len(sys.argv)):
         if sys.argv[i] == '-i':
