@@ -34,7 +34,12 @@ def get_t_max_reward(log_file, max_reward):
                     return t, makespan
     return float('nan'), float('nan')
 
+results_dir = "./results/v4_cb/naive_21/proportional/"
+results_dir = "./results/v4_unit/naive_21/"
+results_dir = "./results/v4_cbws/naive_21/"
 results_dir = "./results/v4_cb/naive_21/duration/"
+results_dir = "./results/v4_cb/naive_21/peak/"
+
 
 v5_results_dir = "./results/v5/naive_21/"
 
