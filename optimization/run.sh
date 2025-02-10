@@ -54,10 +54,10 @@
 
 
 
-INSTANCE_DIR="./data/instances_v4/rnd_large/"
+INSTANCE_DIR="./data/instances_v4/rnd_large_2/"
 
 # Generate cb solutions for all instances
-OUTPUT="./results/v4_cb/rnd_large/"
+OUTPUT="./results/v4_cb/rnd_large_2/"
 SCRIPT="./optimization/models/rebalance_unit.py"
 TIMEOUT=3600
 
