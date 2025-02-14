@@ -1,0 +1,9 @@
+Traceback (most recent call last):
+  File "/media/citi-ai/david/YouBikeOptimization/./optimization/models/rebalance_v5.py", line 216, in <module>
+    rebalance_v5(instance_path, solution_path, time_limit)
+  File "/media/citi-ai/david/YouBikeOptimization/./optimization/models/rebalance_v5.py", line 27, in rebalance_v5
+    data = json.load(file)
+  File "/home/citi-ai/.pyenv/versions/3.10.12/lib/python3.10/json/__init__.py", line 293, in load
+    return loads(fp.read(),
+  File "/home/citi-ai/.pyenv/versions/3.10.12/lib/python3.10/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
