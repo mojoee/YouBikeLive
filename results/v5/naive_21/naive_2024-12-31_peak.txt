@@ -1,0 +1,118 @@
+Solving ./data/instances_v4/naive_21/naive_2024-12-31_peak.json
+stations_cnt: 1507
+demand_min: -38
+demand_max: 36
+abs_demands_total: 10188
+vehicles_cnt: 39
+vehicles_capacities: [12, 24, 24, 12, 24, 24, 12, 24, 24, 12, 24, 24, 12, 24, 24, 12, 24, 24, 12, 24, 24, 12, 24, 24, 12, 24, 24, 12, 24, 24, 12, 24, 24, 12, 24, 24, 12, 24, 24]
+vehicles_depots [0, 0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6, 7, 7, 7, 8, 8, 8, 9, 9, 9, 10, 10, 10, 11, 11, 11, 12, 12, 12]
+depots_cnt: 13
+parking_time: 180
+loading_time: 60
+max_trip_duration: 28800
+
+Preprocess model 0%
+Preprocess model 1%
+Preprocess model 1%
+Preprocess model 2%
+Preprocess model 2%
+Preprocess model 3%
+Preprocess model 3%
+Preprocess model 4%
+Preprocess model 4%
+Preprocess model 5%
+Preprocess model 5%
+Preprocess model 6%
+Preprocess model 7%
+Preprocess model 7%
+Preprocess model 8%
+Preprocess model 8%
+Preprocess model 9%
+Preprocess model 9%
+Preprocess model 10%
+Preprocess model 10%
+Preprocess model 11%
+Preprocess model 12%
+Preprocess model 12%
+Preprocess model 13%
+Preprocess model 13%
+Preprocess model 14%
+Preprocess model 14%
+Preprocess model 14%
+Preprocess model 29%
+Preprocess model 43%
+Preprocess model 57%
+Preprocess model 71%
+Preprocess model 86%
+Preprocess model 87%
+Preprocess model 88%
+Preprocess model 89%
+Preprocess model 90%
+Preprocess model 92%
+Preprocess model 93%
+Preprocess model 94%
+Preprocess model 95%
+Preprocess model 96%
+Preprocess model 98%
+Preprocess model 99%
+Preprocess model 100%
+Preprocess model 100%
+Preprocess model 100%
+Initialize solver 0%
+Initialize solver 17%
+Initialize solver 33%
+Initialize solver 50%
+Initialize solver 67%
+Initialize solver 83%
+Initialize solver 85%
+Initialize solver 86%
+Initialize solver 88%
+Initialize solver 89%
+Initialize solver 90%
+Initialize solver 92%
+Initialize solver 93%
+Initialize solver 94%
+Initialize solver 96%
+Initialize solver 97%
+Initialize solver 99%
+Initialize solver 100%
+Initialize solver 100%
+Initialize solver 100%
+Push initial solution 0%
+Push initial solution 8%
+Push initial solution 17%
+Push initial solution 25%
+Push initial solution 33%
+Push initial solution 42%
+Push initial solution 50%
+Push initial solution 58%
+Push initial solution 67%
+Push initial solution 75%
+Push initial solution 83%
+Push initial solution 92%
+Push initial solution 100%
+Push initial solution 100%
+
+Model:  expressions = 5990, decisions = 39, constraints = 40, objectives = 2
+Param:  time limit = 5 sec, no iteration limit
+
+[objective directions]:     maximize |     minimize
+
+[  0 sec,       0 itr]:            0 |            0
+[ optimality gaps    ]:      100.00% |           0%
+[  1 sec,   54762 itr]:         8838 |        28789
+[  2 sec,  110815 itr]:         9373 |        28792
+[  3 sec,  159680 itr]:         9624 |        28773
+[  4 sec,  221313 itr]:         9729 |        28798
+[  5 sec,  259890 itr]:         9817 |        28785
+[  5 sec,  259890 itr]:         9817 |        28785
+[ optimality gaps    ]:       99.56% |      100.00%
+
+259890 iterations performed in 5 seconds
+
+Feasible solution: 
+  obj    =         9817 |        28785
+  gap    =       99.56% |      100.00%
+  bounds =  2.23337e+06 |            0
+Solution exported to ./results/v5/naive_21/naive_2024-12-31_peak.json
+Map saved as './results/v5/naive_21/naive_2024-12-31_peak.html'

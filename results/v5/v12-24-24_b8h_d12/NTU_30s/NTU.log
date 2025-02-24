@@ -1,0 +1,140 @@
+Solving ./data/instances_v4/v12-24-24_b8h_d12/NTU.json
+stations_cnt: 58
+demand_min: -25
+demand_max: 25
+abs_demands_total: 722
+vehicles_cnt: 3
+vehicles_capacities: [12, 24, 24]
+vehicles_depots [0, 0, 0]
+depots_cnt: 1
+parking_time: 180
+loading_time: 60
+max_trip_duration: 28800
+
+Preprocess model 0%
+Preprocess model 1%
+Preprocess model 1%
+Preprocess model 2%
+Preprocess model 2%
+Preprocess model 3%
+Preprocess model 3%
+Preprocess model 4%
+Preprocess model 4%
+Preprocess model 5%
+Preprocess model 5%
+Preprocess model 6%
+Preprocess model 7%
+Preprocess model 7%
+Preprocess model 8%
+Preprocess model 8%
+Preprocess model 9%
+Preprocess model 9%
+Preprocess model 10%
+Preprocess model 10%
+Preprocess model 11%
+Preprocess model 12%
+Preprocess model 12%
+Preprocess model 13%
+Preprocess model 13%
+Preprocess model 14%
+Preprocess model 14%
+Preprocess model 14%
+Preprocess model 29%
+Preprocess model 43%
+Preprocess model 44%
+Preprocess model 44%
+Preprocess model 45%
+Preprocess model 46%
+Preprocess model 47%
+Preprocess model 48%
+Preprocess model 48%
+Preprocess model 49%
+Preprocess model 50%
+Preprocess model 51%
+Preprocess model 52%
+Preprocess model 52%
+Preprocess model 53%
+Preprocess model 54%
+Preprocess model 57%
+Preprocess model 71%
+Preprocess model 86%
+Preprocess model 87%
+Preprocess model 88%
+Preprocess model 89%
+Preprocess model 90%
+Preprocess model 92%
+Preprocess model 93%
+Preprocess model 94%
+Preprocess model 95%
+Preprocess model 96%
+Preprocess model 98%
+Preprocess model 99%
+Preprocess model 100%
+Preprocess model 100%
+Preprocess model 100%
+Initialize solver 0%
+Initialize solver 17%
+Initialize solver 33%
+Initialize solver 50%
+Initialize solver 67%
+Initialize solver 83%
+Initialize solver 92%
+Initialize solver 100%
+Initialize solver 100%
+Initialize solver 100%
+Push initial solution 0%
+Push initial solution 50%
+Push initial solution 100%
+Push initial solution 100%
+
+Model:  expressions = 620, decisions = 3, constraints = 4, objectives = 2
+Param:  time limit = 30 sec, no iteration limit
+
+[objective directions]:     maximize |     minimize
+
+[  0 sec,       0 itr]:            0 |            0
+[ optimality gaps    ]:      100.00% |           0%
+[  1 sec,   11401 itr]:          722 |        19531
+[  2 sec,   38765 itr]:          722 |        19122
+[  3 sec,   62842 itr]:          722 |        19122
+[  4 sec,   90131 itr]:          722 |        19105
+[  5 sec,  118295 itr]:          722 |        19100
+[  6 sec,  142623 itr]:          722 |        19100
+[  7 sec,  172193 itr]:          722 |        19100
+[  8 sec,  198669 itr]:          722 |        19100
+[  9 sec,  230147 itr]:          722 |        19100
+[ 10 sec,  260280 itr]:          722 |        19085
+[ optimality gaps    ]:       83.40% |      100.00%
+[ 11 sec,  285148 itr]:          722 |        19059
+[ 12 sec,  316014 itr]:          722 |        19056
+[ 13 sec,  331681 itr]:          722 |        19051
+[ 14 sec,  347497 itr]:          722 |        19051
+[ 15 sec,  363004 itr]:          722 |        19051
+[ 16 sec,  378378 itr]:          722 |        19051
+[ 17 sec,  401690 itr]:          722 |        19051
+[ 18 sec,  427138 itr]:          722 |        19051
+[ 19 sec,  449687 itr]:          722 |        19051
+[ 20 sec,  472759 itr]:          722 |        19051
+[ optimality gaps    ]:       83.40% |      100.00%
+[ 21 sec,  498727 itr]:          722 |        19051
+[ 22 sec,  517779 itr]:          722 |        19051
+[ 23 sec,  535161 itr]:          722 |        19051
+[ 24 sec,  558681 itr]:          722 |        19051
+[ 25 sec,  584107 itr]:          722 |        19051
+[ 26 sec,  602349 itr]:          722 |        19051
+[ 27 sec,  616317 itr]:          722 |        19051
+[ 28 sec,  632736 itr]:          722 |        19051
+[ 29 sec,  650883 itr]:          722 |        19051
+[ 30 sec,  672241 itr]:          722 |        19051
+[ optimality gaps    ]:       83.40% |      100.00%
+[ 30 sec,  672241 itr]:          722 |        19051
+[ optimality gaps    ]:       83.40% |      100.00%
+
+672241 iterations performed in 30 seconds
+
+Feasible solution: 
+  obj    =          722 |        19051
+  gap    =       83.40% |      100.00%
+  bounds =         4350 |            0
+Solution exported to ./results/v5/v12-24-24_b8h_d12/NTU.json
+Map saved as './results/v5/v12-24-24_b8h_d12/NTU.html'
