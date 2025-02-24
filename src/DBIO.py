@@ -81,7 +81,7 @@ class YouBikeDataManager:
         return bike_stations, weather_stations
 
 
-    def load_and_preprocess_station(self, station_id):
+    def load_and_preprocess_station(self, station_id: str):
         query = f"""
         SELECT available_rent_bikes, mday, available_return_bikes
         FROM youbike_status

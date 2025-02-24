@@ -4,14 +4,30 @@ from datetime import datetime
 import schedule
 import time
 import logging
-from undetected_chromedriver import Chrome, ChromeOptions
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+import shutil
+import os
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.chrome.options import Options
+from webdriver_manager.chrome import ChromeDriverManager
+
+options = Options()
+options.add_argument("--headless")
+options.add_argument("--no-sandbox")
+options.add_argument("--disable-dev-shm-usage")
+options.add_argument("--disable-gpu")  # If running in a virtual environment
+
+service = Service(ChromeDriverManager().install())
+driver = webdriver.Chrome(service=service, options=options)
+driver.set_page_load_timeout(60)  # Increase timeout to 60 seconds
 
 # Logging configuration
 logging.basicConfig(level=logging.INFO, filename='data_collector.log', 
                     format='%(asctime)s - %(levelname)s - %(message)s')
+logging.info("Data collector started.")
 
 # Database setup
 db_path = 'youbike_data.db'
@@ -110,12 +126,17 @@ def fetch_youbike_data():
 # Weather data fetch function
 def fetch_weather_data():
     url = "https://www.cwa.gov.tw/V8/E/W/OBS_County.html?ID=63"
-    options = ChromeOptions()
-    options.add_argument("--headless")
-    options.add_argument("--disable-blink-features=AutomationControlled")
-    options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36")
+    # options = Options()
+    # options.add_argument("--headless")
+    # options.add_argument("--no-sandbox")
+    # options.add_argument("--disable-dev-shm-usage")
+    # options.add_argument("--disable-blink-features=AutomationControlled")
+    # options.add_argument("--disable-gpu")
+    # options.add_argument("--remote-debugging-port=9222")
+    # options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36")
 
-    driver = Chrome(options=options)
+    # # Specify the path to the ChromeDriver executable
+    # driver = webdriver.Chrome(service=ChromeService(executable_path='/usr/local/bin/chromedriver'), options=options)
 
     try:
         driver.get(url)
@@ -201,17 +222,30 @@ def fetch_weather_data():
 
     except Exception as e:
         logging.error(f"Error during weather data scraping: {e}")
-    finally:
-        driver.quit()
 
-# Scheduler setup
-schedule.every(10).minutes.do(fetch_youbike_data)
-schedule.every(10).minutes.do(fetch_weather_data)
 
-# Run the scheduler
-while True:
+def clean_tmp():
+    tmp_path = "/tmp"  # Or your custom temp directory
     try:
-        schedule.run_pending()
-        time.sleep(1)
+        shutil.rmtree(tmp_path, ignore_errors=True)
+        os.makedirs(tmp_path, exist_ok=True)
+        logging.info("Temporary files cleaned up.")
     except Exception as e:
-        logging.error(f"Scheduler error: {e}")
+        logging.error(f"Error cleaning temp files: {e}")
+
+# Scheduling functions
+def schedule_jobs():
+    """ Schedules periodic data collection tasks. """
+    schedule.every(10).minutes.do(fetch_youbike_data)
+    schedule.every(10).minutes.do(fetch_weather_data)
+    schedule.every().day.at("00:00").do(clean_tmp)
+
+    while True:
+        schedule.run_pending()
+        time.sleep(60)  # Avoids excessive CPU usage
+
+# Main execution
+if __name__ == "__main__":
+    fetch_youbike_data()  # Run immediately once
+    fetch_weather_data()  # Run immediately once
+    schedule_jobs()  # Start periodic execution
