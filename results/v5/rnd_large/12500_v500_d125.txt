@@ -1,0 +1,7 @@
+Solving ./data/instances_v4/rnd_large_2/12500_v500_d125.json
+stations_cnt: 12500
+demand_min: -96
+demand_max: 98
+abs_demands_total: 207160
+vehicles_cnt: 500
+vehicles_capacities: 

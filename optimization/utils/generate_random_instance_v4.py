@@ -6,7 +6,7 @@ import json
 import sys
 
 
-CNTS = [2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000]
+CNTS = [12500, 15000, 17500, 20000]
 CAPACITIES = [10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 70, 80, 90, 100]
 PARKING_TIME = 120
 LOADING_TIME = 60
@@ -106,7 +106,7 @@ for STATIONS_CNT in CNTS:
     constants = {
         "parking_time": PARKING_TIME,
         "loading_time": LOADING_TIME,
-        "max_trip_time": MAX_TRIP_TIME
+        "max_trip_duration": MAX_TRIP_TIME
     }
 
 
@@ -123,7 +123,7 @@ for STATIONS_CNT in CNTS:
     data_string = json.dumps(data, indent=None)
     # print(data_string)
 
-    output_path = "./data/instances_v4/rnd_large/" + str(STATIONS_CNT) + "_v" + str(VEHICLES_CNT) + "_d" + str(DEPOTS_CNT) + ".json"
+    output_path = "./data/instances_v4/rnd_large_2/" + str(STATIONS_CNT) + "_v" + str(VEHICLES_CNT) + "_d" + str(DEPOTS_CNT) + ".json"
 
     with open(output_path, "w") as outfile:
         outfile.write(data_string)

@@ -1,0 +1,15 @@
+Generating unit instance: ./data/instances_v4/rnd_large_2/20000_v800_d200_cb.json  . . . 
+Generated stations_new
+Generated distances_new
+Generated depot_new
+data_new prepared
+Traceback (most recent call last):
+  File "/media/citi-ai/david/YouBikeOptimization/./optimization/models/rebalance_unit.py", line 123, in <module>
+    rebalance_unit(instance_path, solution_path, time_limit, remove, function_label)
+  File "/media/citi-ai/david/YouBikeOptimization/./optimization/models/rebalance_unit.py", line 72, in rebalance_unit
+    unit_instance_generator(instance_path, unit_instance_path)
+  File "/media/citi-ai/david/YouBikeOptimization/optimization/utils/split_delivery_utils.py", line 426, in generate_cb_instance
+    json.dump(data_new, outfile, indent=None if stCnt_new > 200 else 4)
+  File "/home/citi-ai/.pyenv/versions/3.10.12/lib/python3.10/json/__init__.py", line 180, in dump
+    fp.write(chunk)
+OSError: 
