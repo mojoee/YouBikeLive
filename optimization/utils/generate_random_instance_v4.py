@@ -43,7 +43,7 @@ for STATIONS_CNT in CNTS:
         x = random.randint(0, MAX_COORD)
         y = random.randint(0, MAX_COORD)
 
-        station = {"id": id, "capacity": capacity, "s_init": s_init, "s_goal": s_goal, "coords": [x, y]}
+        station = {"id": id, "capacity": capacity, "s_init": s_init, "s_goal": s_goal, "coords": [x, y], "c_reward": 1}
         stations.append(station)
 
     # Fix initial and goal states sum
