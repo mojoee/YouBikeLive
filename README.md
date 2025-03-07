@@ -214,6 +214,11 @@ Use this space to list resources you find helpful and would like to give credit 
 * [Font Awesome](https://fontawesome.com)
 * [Taipei Open Source Data](https://data.taipei/dataset?qs=youbike)
 * [OSRM Tutorial](https://www.afi.io/blog/introduction-to-osrm-setting-up-osrm-backend-using-docker/?ref=blog.afi.io)
+* [BSS Map](https://bikesharemap.com/#/3/60/40/)
+* [YouBike Start & End statistics](https://data.gov.tw/en/datasets/166492)
+* [Monthly Rental Data 2023](https://data.gov.tw/en/datasets/169174)
+
+
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
