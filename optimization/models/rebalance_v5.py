@@ -151,6 +151,7 @@ def rebalance_v5(instance_path, solution_path, time_limit, routes_init=None):
 
         # SOLVE
         optimizer.param.time_limit = time_limit
+        optimizer.param.set_seed(42)
         optimizer.solve()
 
         # OUTPUT

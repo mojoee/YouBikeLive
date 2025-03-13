@@ -94,10 +94,20 @@ def generate_instance_v4(base_instance_path, output_path):
             }
             vehicles.append(vehicle)
             vehicle_id += 1
+        
+        # Add extra vehicle to Songshan district
+        if district_id == 11:
+            vehicle = {
+                "id": vehicle_id,
+                "depot_id": district_id, 
+                "capacity": 24
+            }
+            vehicles.append(vehicle)
+            vehicle_id += 1
 
     # CONSTANTS
     constants = { # in seconds
-        "parking_time": 180,
+        "parking_time": 120,
         "loading_time":60, 
         "max_trip_duration": 8 * 60 * 60
     }

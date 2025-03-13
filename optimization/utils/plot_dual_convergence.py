@@ -2,10 +2,24 @@
 
 import re
 import matplotlib.pyplot as plt
+import json
 
-logfile = "./results/v4_cbws/v12-24-24_b8h_uniform_goal.txt"
-LB = int(20136 / 60)
+logfile = "./results/v4_cb/naive_21/proportional/naive_2024-12-29_proportional.txt"
+name = "naive_2024-12-29_prop"
 
+logfile = "./results/v4_unit/naive_21/naive_2024-12-29_proportional.txt"
+name = "naive_2024-12-29_prop"
+
+logfile = "./results/v4_cbws/naive_21/naive_2024-12-29_proportional.txt"
+name = "naive_2024-12-29_prop"
+
+
+instance = logfile.split("/")[-1]
+logfile_LB = "./results/v5/naive_21/" + instance.replace(".txt", ".json")
+
+with open(logfile_LB, "r") as f:
+    data = json.load(f)
+    LB = int(data["objectives"][1]["value"] / 60)
 
 
 # Initialize lists to store the data
@@ -83,7 +97,7 @@ labels = [line.get_label() for line in lines]
 ax1.legend(lines, labels, loc='right')
 
 # Add a title
-plt.title('Objectives convergence over time')
+plt.title('Objectives convergence\nInstance: ' + name)
 
 # Save the figure to a PDF file with tight borders
 fig_name = logfile.replace('.txt', '.pdf')

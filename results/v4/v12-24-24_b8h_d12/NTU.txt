@@ -88,27 +88,25 @@ Push initial solution 100%
 Push initial solution 100%
 
 Model:  expressions = 656, decisions = 3, constraints = 10, objectives = 2
-Param:  time limit = 5 sec, no iteration limit
+Param:  time limit = 5 sec, no iteration limit, seed = 42
 
 [objective directions]:     maximize |     minimize
 
 [  0 sec,       0 itr]:            0 |            0
 [ optimality gaps    ]:      100.00% |           0%
-[  1 sec,   32464 itr]:          672 |        19031
-[  2 sec,   69561 itr]:          672 |        18939
-[  3 sec,   93232 itr]:          672 |        18939
-[  4 sec,  117585 itr]:          672 |        18939
-[  5 sec,  143696 itr]:          672 |        18939
-[  5 sec,  143696 itr]:          672 |        18939
+[  1 sec,   21026 itr]:          672 |        19154
+[  2 sec,   44412 itr]:          672 |        18910
+[  3 sec,   68641 itr]:          672 |        18900
+[  4 sec,   87771 itr]:          672 |        18897
+[  5 sec,  102841 itr]:          672 |        18897
+[  5 sec,  102841 itr]:          672 |        18897
 [ optimality gaps    ]:       84.55% |      100.00%
 
-143696 iterations performed in 5 seconds
+102841 iterations performed in 5 seconds
 
 Feasible solution: 
-  obj    =          672 |        18939
+  obj    =          672 |        18897
   gap    =       84.55% |      100.00%
   bounds =         4350 |            0
-[25, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0]
-[0, 25, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0, 12, 0]
 Solution exported to ./results/v4/v12-24-24_b8h_d12/NTU.json
 Map saved as './results/v4/v12-24-24_b8h_d12/NTU.html'

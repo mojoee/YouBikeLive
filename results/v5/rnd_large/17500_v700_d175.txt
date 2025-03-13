@@ -1,0 +1,7 @@
+Solving ./data/instances_v4/rnd_large_2/17500_v700_d175.json
+stations_cnt: 17500
+demand_min: -97
+demand_max: 98
+abs_demands_total: 287346
+vehicles_cnt: 700
+vehicles_capacities: 
