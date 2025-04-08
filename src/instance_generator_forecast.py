@@ -4,7 +4,10 @@ import json
 import os
 from DBIO import YouBikeDataManager
 from config import cfg
-from demand_prediction import DemandPredictionContext, NaiveDemandPredictionStrategy, ProphetDemandPredictionStrategy
+from demand_prediction import DemandPredictionContext, \
+                              NaiveDemandPredictionStrategy, \
+                              ProphetDemandPredictionStrategy, \
+                              WeeklyAverageDemandPredictionStrategy
 
 # ---------------------------------------
 # Configuration
@@ -33,6 +36,8 @@ if cfg.prediction_strategy == "prophet":
     context = DemandPredictionContext(ProphetDemandPredictionStrategy(data_manager))
 elif cfg.prediction_strategy == "naive":
     context = DemandPredictionContext(NaiveDemandPredictionStrategy(data_manager))
+elif cfg.prediction_strategy == "weekly":
+    context = DemandPredictionContext(WeeklyAverageDemandPredictionStrategy(data_manager))
 else:
     raise ValueError(f"Invalid prediction strategy: {cfg.prediction_strategy}")
 
