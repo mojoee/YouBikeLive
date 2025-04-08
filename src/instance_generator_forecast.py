@@ -171,6 +171,7 @@ for i, sno in enumerate(df_distances.columns):
         "district": row['sareaen'].values[0],
         "s_init": int(optimal_allocation[sno][0]),
         "s_goal": int(optimal_allocation[sno][1]),
+        "demand": context.predict_demand(station_id=sno, forecast_date=cfg.instance_start),
         "coords": [row['latitude'].values[0], row['longitude'].values[0]],
     }
     stations.append(station)
