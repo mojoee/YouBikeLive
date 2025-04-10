@@ -66,7 +66,7 @@ class NaiveDemandPredictionStrategy(DemandPredictionStrategy):
                 val_prev_day = df.loc[prev_day, 'demand']
                 val_prev_week = df.loc[prev_week, 'demand']
                 pred = (val_prev_day + val_prev_week) / 2.0
-                predicted_values.append(float(pred))
+                predicted_values.append(int(pred))
             else:
                 predicted_values.append(0.0)
         return predicted_values
