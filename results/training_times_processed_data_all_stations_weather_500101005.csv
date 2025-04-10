@@ -1,0 +1,11 @@
+Model,Time (s)
+LSTM Training Time (s),67.82991576194763
+LSTM Inference Time (s),0.1752934455871582
+ARIMA Training & Inference Time (s),0.9929072856903076
+SARIMA Training & Inference Time (s),82.28767919540405
+Random Forest Training Time (s),367.71355986595154
+Random Forest Inference Time (s),0.006959199905395508
+XGBoost Training Time (s),7.520913124084473
+XGBoost Inference Time (s),0.00167083740234375
+Prophet Training Time (s),0.5879855155944824
+Prophet Inference Time (s),0.6828067302703857
