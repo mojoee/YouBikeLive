@@ -111,13 +111,16 @@ for sno in df_distances.columns:
     s_init = data_manager.get_station_available_bikes_at_time(sno, cfg.instance_start)
     if cfg.inventory_strategy == "min_peak":
         s_goal = min_P_max_policy(hourly_demands, cap)
+        s_goal_real = min_P_max_policy(real_demands, cap)
     elif cfg.inventory_strategy == "nochange":
         s_goal = s_init
         s_goal_real = s_init
     elif cfg.inventory_strategy == "proportional":
         s_goal = int((cap / total_capacity) * total_bikes)
+        s_goal_real = s_goal
     elif cfg.inventory_strategy == "min_total":
         s_goal = min_Q_total_policy(hourly_demands, cap)
+        s_goal_real = min_Q_total_policy(real_demands, cap)
     else:
         print(f"Invalid inventory strategy: {cfg.inventory_strategy}")
     # get intial
