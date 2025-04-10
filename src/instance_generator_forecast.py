@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import json
 import os
+import sys
 from DBIO import YouBikeDataManager
 from config import cfg
 from demand_prediction import DemandPredictionContext, \
@@ -9,6 +10,7 @@ from demand_prediction import DemandPredictionContext, \
                               ProphetDemandPredictionStrategy, \
                               WeeklyAverageDemandPredictionStrategy, \
                               GroundTruthDemandPredictionStrategy
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from optimization.utils.inventory_policies import min_P_max_policy, min_Q_total_policy
 
 # ---------------------------------------
@@ -141,7 +143,8 @@ if total_s_goal != total_s_init:
                 break
             adjustment = np.sign(discrepancy)
             optimal_allocation[sno] = (optimal_allocation[sno][0],
-                                       optimal_allocation[sno][1] + adjustment)
+                                       optimal_allocation[sno][1] + adjustment,
+                                       optimal_allocation[sno][2])
             discrepancy -= adjustment
 
 # Generate instance data

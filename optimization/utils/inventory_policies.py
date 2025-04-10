@@ -56,7 +56,7 @@ def min_P_max_policy(demands, s_cap):
             best_s_init_cands = [s_init_cand]
         elif P_max == min_P_max:
             best_s_init_cands.append(s_init_cand)
-    print(best_s_init_cands)
+    # print(best_s_init_cands)
     s_init = int(np.median(best_s_init_cands))
     # print(s_init)
     return s_init
@@ -75,7 +75,7 @@ def min_Q_total_policy(demands, s_cap):
             best_s_init_cands = [s_init_cand]
         elif Q_total == min_Q_total:
             best_s_init_cands.append(s_init_cand)
-    print(best_s_init_cands)
+    # print(best_s_init_cands)
     s_init = int(np.median(best_s_init_cands))
     # print(s_init)
     return s_init
