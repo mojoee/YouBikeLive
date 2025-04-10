@@ -108,9 +108,15 @@ class YouBikeDataManager:
     def _compute_demand(self, df, capacity):
         demands = []
         prev_bikes = None
+        capacity = max(df['capacity'])
         for curr_bikes in df['available_rent_bikes']:
             if prev_bikes is None:
                 demand = 0
+            # we check if the station is full or empty
+            # if the station is full, we assume that the 
+            # demand is similar to the previous demand
+            elif curr_bikes == capacity or curr_bikes == 0:
+                demand = demands[-1] 
             else:
                 demand = prev_bikes - curr_bikes
             demands.append(demand)

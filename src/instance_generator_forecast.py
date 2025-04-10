@@ -7,7 +7,8 @@ from config import cfg
 from demand_prediction import DemandPredictionContext, \
                               NaiveDemandPredictionStrategy, \
                               ProphetDemandPredictionStrategy, \
-                              WeeklyAverageDemandPredictionStrategy
+                              WeeklyAverageDemandPredictionStrategy, \
+                              GroundTruthDemandPredictionStrategy
 from optimization.utils.inventory_policies import min_P_max_policy, min_Q_total_policy
 
 # ---------------------------------------
@@ -41,6 +42,9 @@ elif cfg.prediction_strategy == "weekly":
     context = DemandPredictionContext(WeeklyAverageDemandPredictionStrategy(data_manager))
 else:
     raise ValueError(f"Invalid prediction strategy: {cfg.prediction_strategy}")
+
+# Create a separate context for ground truth data
+ground_truth_context = DemandPredictionContext(GroundTruthDemandPredictionStrategy(data_manager))
 
 class NumpyEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -102,12 +106,14 @@ total_bikes = sum([data_manager.get_station_available_bikes_at_time(sno, cfg.ins
 total_capacity = sum([get_station_capacity(df_stations, sno) for sno in df_distances.columns])
 for sno in df_distances.columns:
     hourly_demands = context.predict_demand(station_id=sno, forecast_date=cfg.instance_start)
+    real_demands = ground_truth_context.predict_demand(station_id=sno, forecast_date=cfg.instance_start)
     cap = get_station_capacity(df_stations, sno)
     s_init = data_manager.get_station_available_bikes_at_time(sno, cfg.instance_start)
     if cfg.inventory_strategy == "min_peak":
         s_goal = min_P_max_policy(hourly_demands, cap)
     elif cfg.inventory_strategy == "nochange":
         s_goal = s_init
+        s_goal_real = s_init
     elif cfg.inventory_strategy == "proportional":
         s_goal = int((cap / total_capacity) * total_bikes)
     elif cfg.inventory_strategy == "min_total":
@@ -118,7 +124,7 @@ for sno in df_distances.columns:
     # we need to calculate the 8 hour interval wich is best for rebalancing
     # assuming that we rebalance from 00:00 to 08:00
 
-    optimal_allocation[sno] = (s_init, s_goal)
+    optimal_allocation[sno] = (s_init, s_goal, s_goal_real)
 
 total_s_init = sum([optimal_allocation[sno][0] for sno in df_distances.columns])
 total_s_goal = sum([optimal_allocation[sno][1] for sno in df_distances.columns])
@@ -147,7 +153,9 @@ for i, sno in enumerate(df_distances.columns):
         "district": row['sareaen'].values[0],
         "s_init": int(optimal_allocation[sno][0]),
         "s_goal": int(optimal_allocation[sno][1]),
+        "real_s_goal": int(optimal_allocation[sno][2]),
         "demand": context.predict_demand(station_id=sno, forecast_date=cfg.instance_start),
+        "real_demand": ground_truth_context.predict_demand(station_id=sno, forecast_date=cfg.instance_start),
         "coords": [row['latitude'].values[0], row['longitude'].values[0]],
     }
     stations.append(station)
