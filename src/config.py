@@ -2,6 +2,6 @@ class cfg:
     bokeh_width, bokeh_height = 1000, 800
     instance_time_start = "12:30"
     instance_time_end = "18:30"
-    instance_start = "2025-03-28 00:00:01"
-    prediction_strategy = "naive"  # "prophet" or "naive" or "weekly"
-    inventory_strategy = "proportional" # "duration" or "peak or proportional or nochange"
+    instance_start = "2025-03-24 00:00:00"
+    prediction_strategy = "weekly"  # "prophet" or "naive" or "weekly"
+    inventory_strategy = "peak"
