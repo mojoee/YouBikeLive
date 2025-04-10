@@ -8,7 +8,7 @@ SCRIPT_TO_RUN="src/instance_generator_forecast.py"
 START_DATE="2025-03-24"
 
 # Define the array of inventory strategies to loop through
-INVENTORY_STRATEGIES=("peak" "duration" "nochange" "proportional")
+INVENTORY_STRATEGIES=("min_peak" "min_total" "nochange" "proportional")
 
 # Loop through 7 days (1 week)
 for i in {0..6}; do
