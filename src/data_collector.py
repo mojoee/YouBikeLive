@@ -236,7 +236,7 @@ def clean_tmp():
 # Scheduling functions
 def schedule_jobs():
     """ Schedules periodic data collection tasks. """
-    schedule.every(10).minutes.do(fetch_youbike_data)
+    schedule.every(1).minutes.do(fetch_youbike_data)
     schedule.every(10).minutes.do(fetch_weather_data)
     schedule.every().day.at("00:00").do(clean_tmp)
 
